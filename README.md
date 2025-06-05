@@ -1,6 +1,6 @@
-# Athlobase
+# AthloBase
 
-**Athlobase** is a club and sports team management platform that enables users to manage multiple clubs, training sessions, events, and memberships, all within a centralized dashboard.
+**AthloBase** is a club and sports team management platform that enables users to manage multiple clubs, training sessions, events, and memberships, all within a centralized dashboard.
 
 ---
 
