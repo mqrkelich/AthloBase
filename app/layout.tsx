@@ -8,7 +8,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "AthloBase - All Your Clubs. One Platform.",
   description: "Streamline training, events, and members with a tool built for modern sports communities.",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({

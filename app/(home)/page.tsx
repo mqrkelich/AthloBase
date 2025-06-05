@@ -9,12 +9,8 @@ export default function HomePage() {
     return (
         <div className="min-h-screen bg-black text-white">
 
-
-
-            {/* Header */}
            <Header />
 
-            {/* Hero Section */}
             <section className="pt-32 pb-24 md:pt-40 md:pb-32">
                 <div className="container px-4 md:px-6">
                     <div className="flex flex-col items-center text-center space-y-8 max-w-3xl mx-auto">
@@ -40,12 +36,11 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Features Section */}
             <section id="features" className="py-24 bg-zinc-900">
                 <div className="container px-4 md:px-6">
                     <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">Core Features</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* Feature 1 */}
+
                         <div className="bg-zinc-800/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:translate-y-[-4px]">
                             <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                                 <Layers className="h-6 w-6 text-white" />
@@ -54,7 +49,6 @@ export default function HomePage() {
                             <p className="text-white/70">Create and switch between clubs with a single, unified dashboard.</p>
                         </div>
 
-                        {/* Feature 2 */}
                         <div className="bg-zinc-800/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:translate-y-[-4px]">
                             <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                                 <Calendar className="h-6 w-6 text-white" />
@@ -63,7 +57,6 @@ export default function HomePage() {
                             <p className="text-white/70">Organize practices, matches, and team events effortlessly.</p>
                         </div>
 
-                        {/* Feature 3 */}
                         <div className="bg-zinc-800/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:translate-y-[-4px]">
                             <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                                 <Users className="h-6 w-6 text-white" />
@@ -72,7 +65,6 @@ export default function HomePage() {
                             <p className="text-white/70">Manage roles, profiles, and invitations for every club member.</p>
                         </div>
 
-                        {/* Feature 4 */}
                         <div className="bg-zinc-800/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:translate-y-[-4px]">
                             <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                                 <Settings className="h-6 w-6 text-white" />
@@ -81,7 +73,6 @@ export default function HomePage() {
                             <p className="text-white/70">Set sport preferences, manage privacy, and tune settings per club.</p>
                         </div>
 
-                        {/* Feature 5 */}
                         <div className="bg-zinc-800/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:translate-y-[-4px]">
                             <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                                 <Github className="h-6 w-6 text-white" />
@@ -90,7 +81,6 @@ export default function HomePage() {
                             <p className="text-white/70">Built by and for the community. No fees. No limits.</p>
                         </div>
 
-                        {/* Feature 6 */}
                         <div className="bg-zinc-800/50 p-8 rounded-2xl border border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:translate-y-[-4px]">
                             <div className="h-12 w-12 rounded-full bg-white/10 flex items-center justify-center mb-6">
                                 <CheckCircle className="h-6 w-6 text-white" />
@@ -102,7 +92,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* How It Works Section */}
             <section className="py-24">
                 <div className="container px-4 md:px-6">
                     <div className="max-w-3xl mx-auto text-center mb-16">
@@ -135,7 +124,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Final CTA Section */}
             <section className="py-24 bg-gradient-to-b from-zinc-900 to-black">
                 <div className="container px-4 md:px-6">
                     <div className="max-w-3xl mx-auto text-center space-y-8">
@@ -152,7 +140,6 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Footer */}
             <Footer />
         </div>
     )
