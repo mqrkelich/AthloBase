@@ -4,12 +4,28 @@ import { ArrowRight, CheckCircle, Layers, Calendar, Users, Settings, Github } fr
 import { Button } from "@/components/ui/button"
 import {Header} from "@/components/header";
 import {Footer} from "@/components/footer";
+import { getUserById } from "@/data/user";
+import { getCurrentUser } from "@/lib/helper/session";
 
-export default function HomePage() {
+export default async function HomePage() {
+
+    const user = await getCurrentUser();
+    const dbUser = user ? await getUserById(user.id!) : null;
+
     return (
         <div className="min-h-screen bg-black text-white">
 
-           <Header />
+            <Header
+                user={
+                    dbUser
+                        ? {
+                            id: dbUser.id,
+                            name: dbUser.name ?? "Anonymous",
+                            image: dbUser.image ?? null,
+                        }
+                        : undefined
+                }
+            />
 
             <section className="pt-32 pb-24 md:pt-40 md:pb-32">
                 <div className="container px-4 md:px-6">
