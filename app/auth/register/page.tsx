@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import {RegisterForm} from "@/app/auth/register/_components/register-form";
 
 export default function RegisterPage() {
   return (
@@ -26,50 +27,7 @@ export default function RegisterPage() {
             </div>
 
 
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-white/80 text-sm font-medium">
-                  Full Name
-                </Label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white/80 text-sm font-medium">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-white/80 text-sm font-medium">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Create a password"
-                  className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-white text-black hover:bg-white/90 h-12 rounded-xl font-medium transition-all duration-200"
-              >
-                Create Account →
-              </Button>
-            </form>
+            <RegisterForm />
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

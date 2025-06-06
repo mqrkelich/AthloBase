@@ -3,9 +3,9 @@ import Link from "next/link"
 import { Github } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+
 import { Separator } from "@/components/ui/separator"
+import { LoginForm } from "./_components/login-form"
 
 export default function LoginPage() {
   return (
@@ -26,45 +26,7 @@ export default function LoginPage() {
               <p className="text-white/60">Sign in to your account</p>
             </div>
 
-
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white/80 text-sm font-medium">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-white/80 text-sm font-medium">
-                    Password
-                  </Label>
-                  <Link href="/forgot-password" className="text-white/60 hover:text-white/80 text-sm transition-colors">
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full bg-white text-black hover:bg-white/90 h-12 rounded-xl font-medium transition-all duration-200"
-              >
-                Sign In →
-              </Button>
-            </form>
-
+            <LoginForm />
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
