@@ -47,8 +47,35 @@ model User {
   image         String?
   password      String?
   role          UserRole  @default(USER)
+  onboarding    Boolean   @default(false)
+  createdAt     DateTime  @default(now())
 
+  accounts    Account[]
+  clubMembers ClubMembers[]
+}
+
+model Club {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clubOwnerId String @db.ObjectId
+
+  clubMembers ClubMembers[]
+}
+
+model ClubMembers {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  clubId    String   @db.ObjectId
+  role      UserRole @default(USER)
   createdAt DateTime @default(now())
 
-  accounts Account[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, clubId])
 }
