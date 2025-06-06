@@ -111,7 +111,7 @@ export const RegisterForm = () => {
                         <Label htmlFor="password" className="text-white/80 text-sm font-medium">
                             Password
                         </Label>
-                        <Link href="/forgot-password" className="text-white/60 hover:text-white/80 text-sm transition-colors">
+                        <Link href="/auth/forgot-password" className="text-white/60 hover:text-white/80 text-sm transition-colors">
                             Forgot password?
                         </Link>
                     </div>
