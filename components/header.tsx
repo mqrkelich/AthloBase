@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, Settings, User } from "lucide-react"
-import { signOut } from "next-auth/react"
+import {signOutAction} from "@/actions/login";
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
     user?: {
@@ -25,7 +25,7 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
 
 export function Header({ user }: HeaderProps) {
     const handleSignOut = async () => {
-        await signOut();
+        await signOutAction();
     }
 
     const getUserInitials = (name: string) => {

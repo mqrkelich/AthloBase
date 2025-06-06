@@ -11,22 +11,41 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { createClub } from "../_actions/create-club"
+import { toast } from "sonner"
+
 
 type Step = 1 | 2 | 3 | 4
 
+type Privacy = "public" | "private" | "restricted"
+// type SkillLevel = "beginner" | "intermediate" | "advanced" | "mixed"
+// type AgeGroup = "youth" | "adult" | "senior" | "all-ages"
+
+type ClubFormData = {
+    name: string
+    sport: string
+    description: string
+    location: string
+    privacy: Privacy
+    meetingDays: string[]
+    meetingTime: string
+    skillLevel: string
+    ageGroup: string
+}
+
 export default function OwnerOnboardingPage() {
     const [currentStep, setCurrentStep] = useState<Step>(1)
-    const [clubData, setClubData] = useState({
+    const [clubData, setClubData] = useState<ClubFormData>({
         name: "",
         sport: "",
         description: "",
         location: "",
         privacy: "public",
-        meetingDays: [] as string[],
+        meetingDays: [],
         meetingTime: "",
         skillLevel: "",
         ageGroup: "",
-    })
+    });
 
     const steps = [
         { number: 1, title: "Basic Info", description: "Club name and sport" },
@@ -119,10 +138,20 @@ export default function OwnerOnboardingPage() {
         }
     }
 
-    const handleFinish = () => {
-        // Create club and redirect to dashboard
-        console.log("Creating club with data:", clubData)
-        window.location.href = "/dashboard"
+    const handleFinish = async () => {
+
+        await createClub(clubData).then((res) => {
+            if(res.error) {
+                toast.error("Failed to create club.")
+                return
+            }
+
+            if(res.success) {
+                toast.success("Club created successfully")
+                window.location.href = "/dashboard"
+            }
+        })
+
     }
 
     const isStepValid = () => {
@@ -130,7 +159,7 @@ export default function OwnerOnboardingPage() {
             case 1:
                 return clubData.name.trim() && clubData.sport
             case 2:
-                return clubData.description.trim() && clubData.location.trim()
+                return clubData.description.trim().length >= 10 && clubData.location.trim() !== "";
             case 3:
                 return clubData.meetingDays.length > 0 && clubData.meetingTime
             case 4:
@@ -257,6 +286,13 @@ export default function OwnerOnboardingPage() {
                                             onChange={(e) => setClubData((prev) => ({ ...prev, description: e.target.value }))}
                                             className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 min-h-32 rounded-xl"
                                         />
+
+                                        {clubData.description.trim().length < 10 && (
+                                            <p className="text-red-500 text-sm mt-1">
+                                                Description must be at least 10 characters.
+                                            </p>
+                                        )}
+
                                     </div>
 
                                     <div className="space-y-2">
@@ -332,7 +368,12 @@ export default function OwnerOnboardingPage() {
                                         <Label className="text-white/80 text-sm font-medium">Club Privacy</Label>
                                         <Select
                                             value={clubData.privacy}
-                                            onValueChange={(value) => setClubData((prev) => ({ ...prev, privacy: value }))}
+                                            onValueChange={(value) =>
+                                                setClubData((prev) => ({
+                                                    ...prev,
+                                                    privacy: value as "public" | "private" | "restricted",
+                                                }))
+                                            }
                                         >
                                             <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                                                 <SelectValue />
