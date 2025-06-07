@@ -23,7 +23,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-white/60">Welcome back, John. Here's what's happening with your clubs.</p>
+                    <p className="text-white/60">Welcome back, {user.name}. Here's what's happening with your clubs.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button variant="outline" className="border-white/10 hover:bg-white/5">

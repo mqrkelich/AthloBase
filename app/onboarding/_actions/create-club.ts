@@ -104,6 +104,7 @@ export const createClub = async (
             where: { id: dbUser.id },
             data: {
                 onboarding: false,
+                dashboardView: "owner",
             },
         })
 

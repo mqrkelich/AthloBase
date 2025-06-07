@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,6 +5,11 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 model Account {
@@ -34,14 +33,10 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-enum UserRole {
-  USER
-  ADMIN
-}
-
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
+  username      String?
   email         String?   @unique
   emailVerified DateTime?
   image         String?
@@ -49,6 +44,7 @@ model User {
   role          UserRole  @default(USER)
   onboarding    Boolean   @default(false)
   createdAt     DateTime  @default(now())
+  dashboardView String? @default("member")
 
   accounts    Account[]
   clubMembers ClubMembers[]
@@ -59,11 +55,12 @@ model Club {
   name        String
   description String?
   image       String?
+  logo    String?
+  website String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   inviteCode String @unique
-
   clubOwnerId String @db.ObjectId
 
   sport       String
@@ -73,8 +70,15 @@ model Club {
   meetingTime String
   skillLevel  String
   ageGroup    String
+  foundedDate DateTime?
+
+  memberCount  Int?
+  activeEvents Int?
+  totalEvents  Int?
 
   clubMembers ClubMembers[]
+  customStats ClubStat[]
+  pricing     ClubPricing[]
 }
 
 model ClubMembers {
@@ -88,4 +92,34 @@ model ClubMembers {
   club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
 
   @@unique([userId, clubId])
+}
+
+model ClubStat {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  clubId String  @db.ObjectId
+  label  String
+  value  String
+  unit   String
+  icon   String?
+
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+}
+
+model ClubPricing {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  clubId   String @db.ObjectId
+  interval String // "weekly", "monthly", "yearly"
+  name     String
+  price    Float
+
+  club     Club                 @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  features ClubPricingFeature[]
+}
+
+model ClubPricingFeature {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  pricingId   String @db.ObjectId
+  description String
+
+  pricing ClubPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
 }

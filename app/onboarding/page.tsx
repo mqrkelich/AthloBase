@@ -10,6 +10,7 @@ export const metadata = {
     title: "Products",
 };
 
+
 export default async function Page() {
     const session = await getCurrentUser();
     const user = await getUserById(session?.id!);

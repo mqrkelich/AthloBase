@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut, Settings, User } from "lucide-react"
 import {signOutAction} from "@/actions/login";
+import {getUserInitials} from "@/lib/helper/get-initials"
 
 interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
     user?: {
@@ -26,15 +27,6 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
 export function Header({ user }: HeaderProps) {
     const handleSignOut = async () => {
         await signOutAction();
-    }
-
-    const getUserInitials = (name: string) => {
-        return name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2)
     }
 
     return (

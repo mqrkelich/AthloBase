@@ -37,7 +37,7 @@ export default async function HomePage() {
                             Streamline training, events, and members with a tool built for modern sports communities.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                            <Link href="/signup">
+                            <Link href="/auth/register">
                                 <Button size="lg" className="bg-white text-black hover:bg-white/90 px-8">
                                     Get Started <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
@@ -147,7 +147,7 @@ export default async function HomePage() {
                         <p className="text-xl text-white/70">
                             Join thousands of sports clubs already using our platform to streamline their operations.
                         </p>
-                        <Link href="/signup" className="inline-block">
+                        <Link href="/auth/register" className="inline-block">
                             <Button size="lg" className="bg-white text-black hover:bg-white/90 px-8 text-lg">
                                 Create Your First Club <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
