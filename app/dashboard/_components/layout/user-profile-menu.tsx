@@ -32,8 +32,9 @@ export function UserProfileMenu({user, onProfileClick, onSettingsClick}: UserPro
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="w-full justify-start px-2">
                     <Avatar className="h-8 w-8 mr-2">
-                        <AvatarImage src={user.avatar || "/placeholder.svg?height=32&width=32"} alt={user.name}/>
-                        <AvatarFallback>{getUserInitials(user.name)}</AvatarFallback>
+                        {user.avatar ? <AvatarImage src={user.avatar} alt={user.name}/> : <AvatarFallback
+                            className="bg-white/10 text-white">{getUserInitials(user.name)}</AvatarFallback>}
+
                     </Avatar>
                     <div className="flex flex-col items-start text-sm">
                         <span className="font-medium">{user.name}</span>

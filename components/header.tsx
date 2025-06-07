@@ -57,8 +57,9 @@ export function Header({ user }: HeaderProps) {
                                     className="relative h-10 w-10 rounded-full p-0 "
                                 >
                                     <Avatar className="h-10 w-10 overflow-hidden">
-                                        <AvatarImage src={user.image || undefined} alt={user.name} />
-                                        <AvatarFallback className="bg-white/10 text-white">{getUserInitials(user.name)}</AvatarFallback>
+                                        {user.image ? <AvatarImage src={user.image} alt={user.name}/> : <AvatarFallback
+                                            className="bg-white/10 text-white">{getUserInitials(user.name)}</AvatarFallback>}
+
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
