@@ -53,7 +53,7 @@ export function ScheduleStep({clubData, setClubData}: ScheduleStepProps) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                     <div className="space-y-2">
                         <Label htmlFor="meetingTime" className="text-white/80 text-sm font-medium">
                             Typical Meeting Time *
@@ -67,22 +67,6 @@ export function ScheduleStep({clubData, setClubData}: ScheduleStepProps) {
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label className="text-white/80 text-sm font-medium">Session Duration</Label>
-                        <Select>
-                            <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
-                                <SelectValue placeholder="Select duration"/>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="30">30 minutes</SelectItem>
-                                <SelectItem value="60">1 hour</SelectItem>
-                                <SelectItem value="90">1.5 hours</SelectItem>
-                                <SelectItem value="120">2 hours</SelectItem>
-                                <SelectItem value="180">3 hours</SelectItem>
-                                <SelectItem value="custom">Custom</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
                 </div>
             </div>
         </div>

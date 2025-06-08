@@ -70,7 +70,6 @@ export function useClubCreation() {
 
     const handleFinish = () => {
 
-        //
 
         // Create club and redirect to dashboard
         console.log("Creating club with data:", clubData)

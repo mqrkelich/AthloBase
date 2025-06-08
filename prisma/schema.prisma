@@ -72,9 +72,16 @@ model Club {
   ageGroup    String
   foundedDate DateTime?
 
+  rules      String?
+  maxMembers Int?    @default(100)
+
   memberCount  Int?
   activeEvents Int?
   totalEvents  Int?
+
+  instagram String?
+  facebook  String?
+  twitter   String?
 
   clubMembers ClubMembers[]
   customStats ClubStat[]

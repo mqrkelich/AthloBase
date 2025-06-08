@@ -17,7 +17,7 @@ import {useClubCreation} from "@/app/dashboard/club/new/_hooks/use-club-creation
 type Step = 1 | 2 | 3 | 4 | 5
 
 export default function CreateClubPage() {
-    const [currentStep, setCurrentStep] = useState<Step>(5)
+    const [currentStep, setCurrentStep] = useState<Step>(1)
     const {clubData, setClubData, isStepValid, handleFinish} = useClubCreation()
 
     const handleNext = () => {
