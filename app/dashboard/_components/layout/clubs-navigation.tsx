@@ -43,8 +43,9 @@ export function ClubsNavigation({currentRole, clubs}: ClubsNavigationProps) {
                                         <AvatarImage src={club.logo} alt={club.name}/>
                                         <AvatarFallback>{getUserInitials(club.name)}</AvatarFallback>
                                     </Avatar>
-
-                                    <span>{club.name}</span>
+                                    <span className="truncate max-w-[120px] overflow-hidden whitespace-nowrap">
+                                        {club.name}
+                                    </span>
                                     <Badge
                                         variant="outline"
                                         className={`ml-auto text-xs border-0 ${

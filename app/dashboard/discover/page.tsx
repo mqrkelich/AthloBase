@@ -438,17 +438,12 @@ export default function DiscoverClubsPage() {
                             </div>
                         )}
 
-                        {/* Demo Codes */}
                         <div className="bg-zinc-900/30 border border-white/5 rounded-lg p-3">
                             <h4 className="text-sm font-medium mb-2">Demo Codes</h4>
                             <div className="text-xs space-y-1">
                                 <div className="flex justify-between">
-                                    <span className="text-white/60">City Runners:</span>
-                                    <code className="bg-white/10 px-2 py-1 rounded text-white">runners2024</code>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-white/60">Metro Basketball:</span>
-                                    <code className="bg-white/10 px-2 py-1 rounded text-white">basketball123</code>
+                                    <span className="text-white/60">San Francisco Runners:</span>
+                                    <code className="bg-white/10 px-2 py-1 rounded text-white">san-francisco</code>
                                 </div>
                             </div>
                         </div>

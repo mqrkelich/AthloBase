@@ -113,10 +113,23 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
             {/* Page Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div
-                        className="h-16 w-16 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
-                        {club.name.charAt(0)}
-                    </div>
+
+                    {club.logo ? (
+                        <div>
+                            <img
+                                src={club.logo}
+                                alt={`${club.name} logo`}
+                                className="h-16 w-16 rounded object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div
+                            className="h-16 w-16 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
+                            {club.name.charAt(0)}
+                        </div>
+                    )
+                    }
+
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">{club.name}</h1>
                         <div className="flex items-center gap-3 mt-1">

@@ -8,10 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {useRouter} from "next/navigation";
+import {getClubByInviteCode} from "@/app/dashboard/_actions/get-club"
+import {joinClubWithInvite} from "@/app/dashboard/_actions/join-club"
+import {toast} from "sonner";
 
 export default function MemberOnboardingPage() {
     const [inviteCode, setInviteCode] = useState("")
     const [isValidating, setIsValidating] = useState(false)
+    const router = useRouter()
     const [clubFound, setClubFound] = useState<{
         name: string
         sport: string
@@ -19,33 +24,44 @@ export default function MemberOnboardingPage() {
         description: string
     } | null>(null)
 
+    const [doesExist, setDoesExist] = useState(true)
+
     const handleValidateCode = async () => {
         if (!inviteCode.trim()) return
 
         setIsValidating(true)
 
-        // Simulate API call
-        setTimeout(() => {
-            if (inviteCode.toLowerCase() === "runners2024" || inviteCode.toLowerCase() === "basketball123") {
-                setClubFound({
-                    name: inviteCode.toLowerCase() === "runners2024" ? "City Runners" : "Metro Basketball",
-                    sport: inviteCode.toLowerCase() === "runners2024" ? "Running" : "Basketball",
-                    members: inviteCode.toLowerCase() === "runners2024" ? 76 : 52,
-                    description:
-                        inviteCode.toLowerCase() === "runners2024"
-                            ? "A community of passionate runners training together in the city"
-                            : "Competitive basketball team playing in the metro league",
-                })
-            } else {
-                setClubFound(null)
-            }
+        const club = await getClubByInviteCode(inviteCode);
+        if (!club) {
+            setDoesExist(false)
+            setClubFound(null)
             setIsValidating(false)
-        }, 1500)
+            return
+        }
+
+        setClubFound({
+            name: club.name,
+            sport: club.sport,
+            members: club.memberCount || 0,
+            description: club.description || "No description available",
+        })
+
+        setDoesExist(true)
+        setIsValidating(false)
+
+
     }
 
-    const handleJoinClub = () => {
-        // Redirect to dashboard after joining
-        window.location.href = "/dashboard"
+    const handleJoinClub = async () => {
+        await joinClubWithInvite(inviteCode).then((message) => {
+            if (message.error) {
+                toast.error(message.error)
+                return;
+            }
+
+            router.refresh();
+            toast.success(message.success || "Successfully joined the club.")
+        })
     }
 
     return (
@@ -132,7 +148,7 @@ export default function MemberOnboardingPage() {
                     </Card>
                 )}
 
-                {!clubFound && inviteCode && !isValidating && inviteCode.trim() && (
+                {!doesExist && (
                     <Card className="bg-red-500/10 border-red-500/20 text-white rounded-2xl mb-6">
                         <CardContent className="p-4">
                             <p className="text-red-200 text-sm">
@@ -149,12 +165,8 @@ export default function MemberOnboardingPage() {
                     <CardContent className="space-y-2">
                         <div className="text-xs space-y-1">
                             <div className="flex justify-between">
-                                <span className="text-white/60">City Runners:</span>
-                                <code className="bg-white/10 px-2 py-1 rounded text-white">runners2024</code>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-white/60">Metro Basketball:</span>
-                                <code className="bg-white/10 px-2 py-1 rounded text-white">basketball123</code>
+                                <span className="text-white/60">San Francisco Runners:</span>
+                                <code className="bg-white/10 px-2 py-1 rounded text-white">san-francisco</code>
                             </div>
                         </div>
                     </CardContent>
