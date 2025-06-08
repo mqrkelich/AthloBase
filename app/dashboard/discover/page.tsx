@@ -23,6 +23,7 @@ import {joinClubWithInvite} from "@/app/dashboard/_actions/join-club";
 import {toast} from "sonner";
 import {getClubByInviteCode} from "@/app/dashboard/_actions/get-club";
 import {useRouter} from "next/navigation";
+import {truncate} from "@/lib/utils";
 
 // Mock data for public clubs
 const publicClubs = [
@@ -419,8 +420,9 @@ export default function DiscoverClubsPage() {
                                             <span>{clubFound.members}</span>
                                         </div>
                                     </div>
-                                    <p className="text-white/70 text-sm mt-2">{clubFound.description}</p>
-                                </div>
+                                    <p className="text-white/70 text-sm mt-2">
+                                        {truncate(clubFound.description, 160)}
+                                    </p></div>
 
                                 <Button onClick={handleJoinClub}
                                         className="w-full bg-emerald-500 text-white hover:bg-emerald-600">

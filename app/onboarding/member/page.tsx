@@ -12,6 +12,7 @@ import {useRouter} from "next/navigation";
 import {getClubByInviteCode} from "@/app/dashboard/_actions/get-club"
 import {joinClubWithInvite} from "@/app/dashboard/_actions/join-club"
 import {toast} from "sonner";
+import {truncate} from "@/lib/utils";
 
 export default function MemberOnboardingPage() {
     const [inviteCode, setInviteCode] = useState("")
@@ -135,7 +136,9 @@ export default function MemberOnboardingPage() {
                                         <span>{clubFound.members}</span>
                                     </div>
                                 </div>
-                                <p className="text-white/70 text-sm mt-3">{clubFound.description}</p>
+                                <p className="text-white/70 text-sm mt-3">
+                                    {truncate(clubFound.description, 160)}
+                                </p>
                             </div>
 
                             <Button

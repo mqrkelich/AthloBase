@@ -62,7 +62,7 @@ export function useClubCreation() {
             case 1:
                 return clubData.name.trim() && clubData.sport
             case 2:
-                return clubData.description.trim() && clubData.location.trim()
+                return clubData.description.trim().length >= 10 && clubData.location.trim()
             case 3:
                 return clubData.meetingDays.length > 0 && clubData.meetingTime
             case 4:

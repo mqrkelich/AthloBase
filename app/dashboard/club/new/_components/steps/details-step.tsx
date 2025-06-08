@@ -33,6 +33,13 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                         onChange={(e) => setClubData((prev) => ({...prev, description: e.target.value}))}
                         className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 min-h-32 rounded-xl"
                     />
+
+                    {clubData.description.trim().length > 0 && clubData.description.trim().length < 10 && (
+                        <p className="text-red-500 text-sm mt-1">
+                            Description must be at least 10 characters.
+                        </p>
+                    )}
+
                 </div>
 
                 <div className="space-y-2">
