@@ -88,6 +88,7 @@ export const createClub = async (
                 skillLevel,
                 ageGroup,
                 inviteCode,
+                memberCount: 1,
                 clubOwnerId: dbUser.id,
             },
         });

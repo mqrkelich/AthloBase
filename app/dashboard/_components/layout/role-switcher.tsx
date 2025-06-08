@@ -13,6 +13,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {Badge} from "@/components/ui/badge"
+import {switchRole} from "@/app/dashboard/_actions/switch-role";
+import {useRouter} from "next/navigation";
 
 interface RoleSwitcherProps {
     currentRole: "owner" | "member"
@@ -20,8 +22,14 @@ interface RoleSwitcherProps {
 
 export function RoleSwitcher({currentRole}: RoleSwitcherProps) {
     const [role, setRole] = useState(currentRole)
+    const router = useRouter()
 
-    const handleRoleSwitch = (newRole: "owner" | "member") => {
+    const handleRoleSwitch = async (newRole: "owner" | "member") => {
+
+
+        await switchRole(newRole);
+        router.refresh()
+
         setRole(newRole)
 
     }
