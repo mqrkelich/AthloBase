@@ -59,7 +59,7 @@ export default function MemberOnboardingPage() {
                 return;
             }
 
-            router.refresh();
+            router.replace('/dashboard');
             toast.success(message.success || "Successfully joined the club.")
         })
     }

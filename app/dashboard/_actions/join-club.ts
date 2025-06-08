@@ -52,6 +52,15 @@ export const joinClubWithInvite = async (inviteCode: string) => {
         }
     });
 
+    // Just to make sure, we will set user onboarding to false
+    await db.user.update({
+        where: {id: user.id},
+        data: {
+            onboarding: false,
+            dashboardView: "member",
+        },
+    });
+
     return {success: "Successfully joined the club."}
 
 
