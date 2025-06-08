@@ -1,6 +1,9 @@
 "use client"
 
 import {useState} from "react"
+import {createClubDashboard} from "@/app/dashboard/club/new/_actions/create-club";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 export interface ClubData {
     name: string
@@ -8,14 +11,14 @@ export interface ClubData {
     description: string
     location: string
     website: string
-    privacy: string
+    privacy: "public" | "private" | "restricted"
     meetingDays: string[]
     meetingTime: string
     skillLevel: string
     ageGroup: string
     maxMembers: number
     membershipFee: number
-    feeType: string
+    feeType: "weekly" | "monthly" | "yearly"
     logo: string
     coverImage: string
     rules: string
@@ -27,6 +30,9 @@ export interface ClubData {
 }
 
 export function useClubCreation() {
+
+    const router = useRouter()
+
     const [clubData, setClubData] = useState<ClubData>({
         name: "",
         sport: "",
@@ -68,13 +74,25 @@ export function useClubCreation() {
         }
     }
 
-    const handleFinish = () => {
+    const handleFinish = async () => {
+        const transformed = {
+            ...clubData,
+            pricing: {
+                interval: clubData.feeType as "weekly" | "monthly" | "yearly",
+                name: "Standard Membership",
+                price: clubData.membershipFee,
+            },
+        };
 
-
-        // Create club and redirect to dashboard
-        console.log("Creating club with data:", clubData)
-        //window.location.href = "/dashboard"
-    }
+        await createClubDashboard(transformed).then((result) => {
+            if (result.error) {
+                toast.error("Failed to create club. Please try again.");
+            } else {
+                toast.success("Club created successfully!");
+                router.replace("/dashboard");
+            }
+        })
+    };
 
     return {
         clubData,

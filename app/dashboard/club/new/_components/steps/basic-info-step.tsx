@@ -107,7 +107,7 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
                         </SelectTrigger>
                         <SelectContent>
                             {sports.map((sport) => (
-                                <SelectItem key={sport} value={sport.toLowerCase()}>
+                                <SelectItem key={sport} value={sport}>
                                     {sport}
                                 </SelectItem>
                             ))}

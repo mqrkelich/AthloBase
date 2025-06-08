@@ -1,7 +1,6 @@
 "use server";
 
 import {z} from "zod";
-
 import {getCurrentUser} from "@/lib/helper/session";
 import {db} from "@/lib/db";
 import {getUserById} from "@/data/user";
@@ -12,13 +11,27 @@ const createClubSchema = z.object({
     sport: z.string(),
     description: z.string().min(10).max(500),
     location: z.string(),
+    website: z.string().optional(),
     privacy: z.enum(["public", "private", "restricted"]),
     meetingDays: z.array(z.string()),
     meetingTime: z.string(),
     skillLevel: z.string(),
     ageGroup: z.string(),
+    maxMembers: z.number().min(1),
+    logo: z.string().optional(),
+    coverImage: z.string().optional(),
+    rules: z.string().optional(),
+    socialMedia: z.object({
+        facebook: z.string().optional(),
+        instagram: z.string().optional(),
+        twitter: z.string().optional(),
+    }),
+    pricing: z.object({
+        interval: z.enum(["weekly", "monthly", "yearly"]),
+        name: z.string().min(1),
+        price: z.number().min(0),
+    }),
 });
-
 
 export const createClubDashboard = async (
     values: z.infer<typeof createClubSchema>
@@ -36,8 +49,7 @@ export const createClubDashboard = async (
     const validatedFields = createClubSchema.safeParse(values);
     if (!validatedFields.success) {
         return {
-            error:
-                validatedFields.error.errors?.[0]?.message || "Invalid fields",
+            error: validatedFields.error.errors?.[0]?.message || "Invalid fields",
         };
     }
 
@@ -46,15 +58,21 @@ export const createClubDashboard = async (
         sport,
         description,
         location,
+        website,
         privacy,
         meetingDays,
         meetingTime,
         skillLevel,
         ageGroup,
+        maxMembers,
+        logo,
+        coverImage,
+        rules,
+        socialMedia,
+        pricing,
     } = validatedFields.data;
 
     try {
-
         const inviteCode = await generateUniqueInviteCode();
 
         const club = await db.club.create({
@@ -63,11 +81,19 @@ export const createClubDashboard = async (
                 sport,
                 description,
                 location,
+                website,
                 privacy,
                 meetingDays,
                 meetingTime,
                 skillLevel,
                 ageGroup,
+                maxMembers,
+                logo,
+                image: coverImage,
+                rules,
+                facebook: socialMedia.facebook,
+                instagram: socialMedia.instagram,
+                twitter: socialMedia.twitter,
                 inviteCode,
                 memberCount: 1,
                 clubOwnerId: dbUser.id,
@@ -82,13 +108,22 @@ export const createClubDashboard = async (
             },
         });
 
+        await db.clubPricing.create({
+            data: {
+                clubId: club.id,
+                interval: pricing.interval,
+                name: pricing.name,
+                price: pricing.price,
+            },
+        });
+
         await db.user.update({
             where: {id: dbUser.id},
             data: {
                 onboarding: false,
                 dashboardView: "owner",
             },
-        })
+        });
 
         return {success: true, club};
     } catch (err) {

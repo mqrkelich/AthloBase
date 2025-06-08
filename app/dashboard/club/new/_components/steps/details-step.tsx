@@ -83,7 +83,9 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                             />
                             <Select
                                 value={clubData.feeType}
-                                onValueChange={(value) => setClubData((prev) => ({...prev, feeType: value}))}
+                                onValueChange={(value: "public" | "private" | "restricted") =>
+                                    setClubData((prev) => ({...prev, privacy: value}))
+                                }
                             >
                                 <SelectTrigger
                                     className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl w-32">

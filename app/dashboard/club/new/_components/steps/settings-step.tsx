@@ -25,7 +25,9 @@ export function SettingsStep({clubData, setClubData}: SettingsStepProps) {
                     <Label className="text-white/80 text-sm font-medium">Club Privacy</Label>
                     <Select
                         value={clubData.privacy}
-                        onValueChange={(value) => setClubData((prev) => ({...prev, privacy: value}))}
+                        onValueChange={(value: "public" | "private" | "restricted") =>
+                            setClubData((prev) => ({...prev, privacy: value}))
+                        }
                     >
                         <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                             <SelectValue/>
