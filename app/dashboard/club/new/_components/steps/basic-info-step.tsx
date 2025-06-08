@@ -5,7 +5,7 @@ import type React from "react"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {ClubData} from "@/hooks/use-club-creation";
+import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 
 interface BasicInfoStepProps {
     clubData: ClubData
@@ -16,7 +16,8 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
     const sports = [
         "Running",
         "Basketball",
-        "Soccer",
+        "Football",
+        "American Football",
         "Tennis",
         "Volleyball",
         "Swimming",
@@ -26,11 +27,52 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
         "Golf",
         "Badminton",
         "Table Tennis",
-        "Martial Arts",
-        "Yoga",
-        "CrossFit",
+        "Acrobatic Rock n Roll Dance",
+        "Boxing",
+        "Wrestling",
+        "Karate",
+        "Judo",
+        "Taekwondo",
+        "MMA",
+        "Skateboarding",
+        "Surfing",
+        "Snowboarding",
+        "Skiing",
+        "Ice Hockey",
+        "Field Hockey",
+        "Lacrosse",
+        "Cricket",
+        "Rugby",
+        "Handball",
+        "Fencing",
+        "Archery",
+        "Rowing",
+        "Canoeing",
+        "Kayaking",
+        "Sailing",
+        "Equestrian",
+        "Climbing",
+        "Triathlon",
+        "Duathlon",
+        "Polo",
+        "Diving",
+        "Water Polo",
+        "Bobsledding",
+        "Luge",
+        "Skeleton",
+        "Speed Skating",
+        "Figure Skating",
+        "Darts",
+        "Bowling",
+        "Snooker",
+        "Pickleball",
+        "Disc Golf",
+        "Ultimate Frisbee",
+        "Parkour",
+        "Motocross",
+        "Auto Racing",
         "Other",
-    ]
+    ];
 
     return (
         <div className="space-y-6">

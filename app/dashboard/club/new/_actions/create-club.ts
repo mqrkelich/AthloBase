@@ -1,10 +1,11 @@
 "use server";
 
-import { z } from "zod";
+import {z} from "zod";
 
-import { getCurrentUser } from "@/lib/helper/session";
-import { db } from "@/lib/db";
-import { getUserById } from "@/data/user";
+import {getCurrentUser} from "@/lib/helper/session";
+import {db} from "@/lib/db";
+import {getUserById} from "@/data/user";
+import {generateUniqueInviteCode} from "@/app/onboarding/_actions/create-club";
 
 const createClubSchema = z.object({
     name: z.string().min(3).max(50),
@@ -18,38 +19,18 @@ const createClubSchema = z.object({
     ageGroup: z.string(),
 });
 
-function generateInviteCode(length = 8) {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let code = "";
-    for (let i = 0; i < length; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-}
 
-export async function generateUniqueInviteCode() {
-    let inviteCode = generateInviteCode();
-    let exists = await db.club.findUnique({ where: { inviteCode } });
-
-    while (exists) {
-        inviteCode = generateInviteCode();
-        exists = await db.club.findUnique({ where: { inviteCode } });
-    }
-
-    return inviteCode;
-}
-
-export const createClub = async (
+export const createClubDashboard = async (
     values: z.infer<typeof createClubSchema>
 ) => {
     const session = await getCurrentUser();
     if (!session) {
-        return { error: "Unauthorized!" };
+        return {error: "Unauthorized!"};
     }
 
     const dbUser = await getUserById(session.id!);
     if (!dbUser) {
-        return { error: "User not found." };
+        return {error: "User not found."};
     }
 
     const validatedFields = createClubSchema.safeParse(values);
@@ -102,16 +83,16 @@ export const createClub = async (
         });
 
         await db.user.update({
-            where: { id: dbUser.id },
+            where: {id: dbUser.id},
             data: {
                 onboarding: false,
                 dashboardView: "owner",
             },
         })
 
-        return { success: true, club };
+        return {success: true, club};
     } catch (err) {
         console.error("Club creation failed:", err);
-        return { error: "Failed to create club." };
+        return {error: "Failed to create club."};
     }
 };

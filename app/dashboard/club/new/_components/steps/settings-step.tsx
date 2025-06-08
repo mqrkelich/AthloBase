@@ -5,7 +5,7 @@ import type React from "react"
 import {Label} from "@/components/ui/label"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Switch} from "@/components/ui/switch"
-import {ClubData} from "@/hooks/use-club-creation";
+import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 
 interface SettingsStepProps {
     clubData: ClubData

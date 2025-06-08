@@ -5,7 +5,6 @@ import Link from "next/link"
 import {ArrowLeft} from "lucide-react"
 import {Card, CardContent} from "@/components/ui/card"
 import {CreateClubProgress} from "@/app/dashboard/club/new/_components/create-club-progress";
-import {useClubCreation} from "@/hooks/use-club-creation";
 import {BasicInfoStep} from "@/app/dashboard/club/new/_components/steps/basic-info-step";
 import {DetailsStep} from "@/app/dashboard/club/new/_components/steps/details-step";
 import {ScheduleStep} from "@/app/dashboard/club/new/_components/steps/schedule-step";
@@ -13,11 +12,12 @@ import {SettingsStep} from "@/app/dashboard/club/new/_components/steps/settings-
 import {BrandingStep} from "@/app/dashboard/club/new/_components/steps/branding-step";
 import {CreateClubHeader} from "@/app/dashboard/club/new/_components/create-club-header";
 import {CreateClubNavigation} from "@/app/dashboard/club/new/_components/create-club-navigation";
+import {useClubCreation} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 
 type Step = 1 | 2 | 3 | 4 | 5
 
 export default function CreateClubPage() {
-    const [currentStep, setCurrentStep] = useState<Step>(1)
+    const [currentStep, setCurrentStep] = useState<Step>(5)
     const {clubData, setClubData, isStepValid, handleFinish} = useClubCreation()
 
     const handleNext = () => {

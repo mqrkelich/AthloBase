@@ -57,7 +57,8 @@ export default function OwnerOnboardingPage() {
     const sports = [
         "Running",
         "Basketball",
-        "Soccer",
+        "Football",
+        "American Football",
         "Tennis",
         "Volleyball",
         "Swimming",

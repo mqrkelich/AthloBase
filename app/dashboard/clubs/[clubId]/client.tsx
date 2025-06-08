@@ -194,7 +194,7 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-white/60 text-sm">Founded</p>
-                                <p className="text-2xl font-bold">2019</p>
+                                <p className="text-2xl font-bold">{club.foundedDate}</p>
                             </div>
                             <Trophy className="h-8 w-8 text-purple-500"/>
                         </div>

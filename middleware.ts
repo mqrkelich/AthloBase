@@ -11,6 +11,10 @@ import {
 
 export default auth((req) => {
 
+    if (req.nextUrl.pathname.startsWith("/api/uploadthing")) {
+        return;
+    }
+
     const { nextUrl } = req;
     const isLoggedIn = !!req.auth;
 

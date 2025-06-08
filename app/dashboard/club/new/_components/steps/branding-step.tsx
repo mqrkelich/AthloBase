@@ -1,12 +1,13 @@
 "use client"
 
-import type React from "react"
+import React, {useState} from "react"
 
 import {Upload} from "lucide-react"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Button} from "@/components/ui/button"
-import {ClubData} from "@/hooks/use-club-creation";
+import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
+import {UploadButton} from "@/lib/uploadthing";
 
 interface BrandingStepProps {
     clubData: ClubData
@@ -14,6 +15,11 @@ interface BrandingStepProps {
 }
 
 export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
+
+    // state that shows if the club logo is uploaded
+    const [logo, setLogo] = useState<string | undefined>(undefined);
+    const [coverImage, setCoverImage] = useState<string | undefined>(undefined);
+
     return (
         <div className="space-y-6">
             <div className="text-center mb-6">
@@ -27,13 +33,49 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                     <div className="space-y-4">
                         <Label>Club Logo</Label>
                         <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                            <div
-                                className="h-20 w-20 mx-auto mb-4 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
-                                {clubData.name.charAt(0) || "C"}
-                            </div>
-                            <Button variant="outline" size="sm" className="border-white/10 hover:bg-white/5">
+
+                            {logo ? (
+                                <img
+                                    src={logo}
+                                    alt="Club Logo"
+                                    className="h-20 w-20 mx-auto mb-4 rounded-lg object-cover"
+                                    style={{backgroundColor: "rgba(0, 0, 0, 0.1)"}}
+                                />
+                            ) : (
+                                <div
+                                    className="h-20 w-20 mx-auto mb-4 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
+                                    {clubData.name.charAt(0) || "C"}
+                                </div>
+                            )}
+
+                            <Button variant="outline" size="sm"
+                                    className="relative overflow-hidden border-white/10 hover:bg-white/5">
                                 <Upload className="mr-2 h-4 w-4"/>
                                 Upload Logo
+
+                                <UploadButton
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    endpoint="logoUploader"
+                                    appearance={{
+                                        button: "relative overflow-hidden border-white/10 hover:bg-white/5",
+                                        container: "",
+                                        allowedContent: "hidden"
+                                    }}
+                                    onClientUploadComplete={(res) => {
+                                        console.log("Files: ", res);
+                                        alert("Upload Completed");
+
+                                        setLogo(res[0]?.ufsUrl); // Assuming res[0] contains the uploaded file info
+                                        setClubData((prev) => ({
+                                            ...prev,
+                                            logo: res[0]?.ufsUrl // Update clubData with the uploaded logo URL
+                                        }));
+
+                                    }}
+                                    onUploadError={(error: Error) => {
+                                        alert(`ERROR! ${error.message}`);
+                                    }}
+                                />
                             </Button>
                             <p className="text-xs text-white/50 mt-2">PNG, JPG up to 2MB</p>
                         </div>
@@ -42,15 +84,53 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                     <div className="space-y-4">
                         <Label>Cover Image</Label>
                         <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                            <div
-                                className="h-32 w-full mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
-                                <span className="text-white/60">Cover Image Preview</span>
-                            </div>
-                            <Button variant="outline" size="sm" className="border-white/10 hover:bg-white/5">
+
+                            {coverImage ? (
+                                <img
+                                    src={coverImage}
+                                    alt="Cover Image"
+                                    className="h-32 w-full mb-4 rounded-lg object-cover"
+                                    style={{backgroundColor: "rgba(0, 0, 0, 0.1)"}}
+                                />
+                            ) : (
+                                <div
+                                    className="h-32 w-full mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
+                                    <span className="text-white/60">Cover Image Preview</span>
+                                </div>
+                            )}
+
+
+                            <Button variant="outline" size="sm"
+                                    className="relative overflow-hidden border-white/10 hover:bg-white/5">
                                 <Upload className="mr-2 h-4 w-4"/>
                                 Upload Cover
+
+                                <UploadButton
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    endpoint="coverUploader"
+                                    appearance={{
+                                        button: "relative overflow-hidden border-white/10 hover:bg-white/5",
+                                        container: "",
+                                        allowedContent: "hidden"
+                                    }}
+                                    onClientUploadComplete={(res) => {
+                                        console.log("Files: ", res);
+                                        alert("Upload Completed");
+
+                                        setCoverImage(res[0]?.ufsUrl); // Assuming res[0] contains the uploaded file info
+                                        setClubData((prev) => ({
+                                            ...prev,
+                                            coverImage: res[0]?.ufsUrl // Update clubData with the uploaded logo URL
+                                        }));
+
+                                    }}
+                                    onUploadError={(error: Error) => {
+                                        alert(`ERROR! ${error.message}`);
+                                    }}
+                                />
                             </Button>
-                            <p className="text-xs text-white/50 mt-2">PNG, JPG up to 5MB</p>
+
+                            <p className="text-xs text-white/50 mt-2">PNG, JPG up to 4MB</p>
                         </div>
                     </div>
                 </div>
