@@ -1,0 +1,679 @@
+"use client"
+
+import {useState} from "react"
+import Link from "next/link"
+import {ArrowLeft, Crown, ArrowRight, Check, Upload} from "lucide-react"
+
+import {Button} from "@/components/ui/button"
+import {Card, CardContent} from "@/components/ui/card"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {Textarea} from "@/components/ui/textarea"
+import {Badge} from "@/components/ui/badge"
+import {Switch} from "@/components/ui/switch"
+
+type Step = 1 | 2 | 3 | 4 | 5
+
+export default function CreateClubPage() {
+    const [currentStep, setCurrentStep] = useState<Step>(1)
+    const [clubData, setClubData] = useState({
+        name: "",
+        sport: "",
+        description: "",
+        location: "",
+        website: "",
+        privacy: "public",
+        meetingDays: [] as string[],
+        meetingTime: "",
+        skillLevel: "",
+        ageGroup: "",
+        maxMembers: 100,
+        membershipFee: 0,
+        feeType: "monthly",
+        logo: "",
+        coverImage: "",
+        rules: "",
+        socialMedia: {
+            facebook: "",
+            instagram: "",
+            twitter: "",
+        },
+    })
+
+    const steps = [
+        {number: 1, title: "Basic Info", description: "Club name and sport"},
+        {number: 2, title: "Details", description: "Description and location"},
+        {number: 3, title: "Schedule", description: "Meeting times and frequency"},
+        {number: 4, title: "Settings", description: "Privacy and member preferences"},
+        {number: 5, title: "Branding", description: "Images and social media"},
+    ]
+
+    const sports = [
+        "Running",
+        "Basketball",
+        "Soccer",
+        "Tennis",
+        "Volleyball",
+        "Swimming",
+        "Cycling",
+        "Baseball",
+        "Softball",
+        "Golf",
+        "Badminton",
+        "Table Tennis",
+        "Martial Arts",
+        "Yoga",
+        "CrossFit",
+        "Other",
+    ]
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+    const handleDayToggle = (day: string) => {
+        setClubData((prev) => ({
+            ...prev,
+            meetingDays: prev.meetingDays.includes(day)
+                ? prev.meetingDays.filter((d) => d !== day)
+                : [...prev.meetingDays, day],
+        }))
+    }
+
+    const handleNext = () => {
+        if (currentStep < 5) {
+            setCurrentStep((prev) => (prev + 1) as Step)
+        }
+    }
+
+    const handlePrevious = () => {
+        if (currentStep > 1) {
+            setCurrentStep((prev) => (prev - 1) as Step)
+        }
+    }
+
+    const handleFinish = () => {
+        // Create club and redirect to dashboard
+        console.log("Creating club with data:", clubData)
+        window.location.href = "/dashboard"
+    }
+
+    const isStepValid = () => {
+        switch (currentStep) {
+            case 1:
+                return clubData.name.trim() && clubData.sport
+            case 2:
+                return clubData.description.trim() && clubData.location.trim()
+            case 3:
+                return clubData.meetingDays.length > 0 && clubData.meetingTime
+            case 4:
+                return clubData.skillLevel && clubData.ageGroup
+            case 5:
+                return true // Optional step
+            default:
+                return false
+        }
+    }
+
+    return (
+        <div className="min-h-screen bg-black text-white p-6">
+            <div className="max-w-4xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <Link
+                        href="/dashboard"
+                        className="inline-flex items-center text-white/60 hover:text-white/80 mb-6 transition-colors"
+                    >
+                        <ArrowLeft className="w-4 h-4 mr-2"/>
+                        Back to Dashboard
+                    </Link>
+                    <div className="text-center">
+                        <div
+                            className="h-16 w-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                            <Crown className="h-8 w-8 text-emerald-500"/>
+                        </div>
+                        <h1 className="text-3xl font-bold mb-2">Create Your Club</h1>
+                        <p className="text-white/60">Set up your sports club step by step</p>
+                    </div>
+                </div>
+
+                {/* Progress Steps */}
+                <div className="flex items-center justify-between mb-8 overflow-x-auto">
+                    {steps.map((step, index) => (
+                        <div key={step.number} className="flex items-center min-w-0">
+                            <div className="flex flex-col items-center">
+                                <div
+                                    className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
+                                        currentStep >= step.number ? "bg-emerald-500 text-white" : "bg-zinc-800 text-white/60"
+                                    }`}
+                                >
+                                    {currentStep > step.number ? <Check className="h-5 w-5"/> : step.number}
+                                </div>
+                                <div className="text-center mt-2">
+                                    <div
+                                        className={`text-xs font-medium ${currentStep >= step.number ? "text-white" : "text-white/60"}`}>
+                                        {step.title}
+                                    </div>
+                                    <div className="text-xs text-white/40 hidden sm:block">{step.description}</div>
+                                </div>
+                            </div>
+                            {index < steps.length - 1 && (
+                                <div
+                                    className={`h-px w-8 sm:w-16 mx-2 transition-all duration-200 ${
+                                        currentStep > step.number ? "bg-emerald-500" : "bg-zinc-700"
+                                    }`}
+                                />
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Step Content */}
+                <Card
+                    className="bg-zinc-900/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6 shadow-2xl mb-6">
+                    <CardContent className="p-0">
+                        {/* Step 1: Basic Info */}
+                        {currentStep === 1 && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-white mb-2">Basic Information</h3>
+                                    <p className="text-white/60">What's your club called and what sport do you play?</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="clubName" className="text-white/80 text-sm font-medium">
+                                            Club Name *
+                                        </Label>
+                                        <Input
+                                            id="clubName"
+                                            type="text"
+                                            placeholder="e.g., City Runners, Metro Basketball Club"
+                                            value={clubData.name}
+                                            onChange={(e) => setClubData((prev) => ({...prev, name: e.target.value}))}
+                                            className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="sport" className="text-white/80 text-sm font-medium">
+                                            Sport *
+                                        </Label>
+                                        <Select
+                                            value={clubData.sport}
+                                            onValueChange={(value) => setClubData((prev) => ({...prev, sport: value}))}
+                                        >
+                                            <SelectTrigger
+                                                className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
+                                                <SelectValue placeholder="Select your sport"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {sports.map((sport) => (
+                                                    <SelectItem key={sport} value={sport.toLowerCase()}>
+                                                        {sport}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="location" className="text-white/80 text-sm font-medium">
+                                            Primary Location *
+                                        </Label>
+                                        <Input
+                                            id="location"
+                                            type="text"
+                                            placeholder="e.g., Central Park, Downtown Sports Center"
+                                            value={clubData.location}
+                                            onChange={(e) => setClubData((prev) => ({
+                                                ...prev,
+                                                location: e.target.value
+                                            }))}
+                                            className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="website" className="text-white/80 text-sm font-medium">
+                                            Website (Optional)
+                                        </Label>
+                                        <Input
+                                            id="website"
+                                            type="url"
+                                            placeholder="https://yourclub.com"
+                                            value={clubData.website}
+                                            onChange={(e) => setClubData((prev) => ({
+                                                ...prev,
+                                                website: e.target.value
+                                            }))}
+                                            className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 2: Details */}
+                        {currentStep === 2 && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-white mb-2">Club Details</h3>
+                                    <p className="text-white/60">Tell us more about your club and its purpose</p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="description" className="text-white/80 text-sm font-medium">
+                                            Club Description *
+                                        </Label>
+                                        <Textarea
+                                            id="description"
+                                            placeholder="Describe your club, its goals, and what makes it special..."
+                                            value={clubData.description}
+                                            onChange={(e) => setClubData((prev) => ({
+                                                ...prev,
+                                                description: e.target.value
+                                            }))}
+                                            className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 min-h-32 rounded-xl"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="rules" className="text-white/80 text-sm font-medium">
+                                            Club Rules & Guidelines (Optional)
+                                        </Label>
+                                        <Textarea
+                                            id="rules"
+                                            placeholder="List any important rules, expectations, or guidelines for members..."
+                                            value={clubData.rules}
+                                            onChange={(e) => setClubData((prev) => ({...prev, rules: e.target.value}))}
+                                            className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 min-h-24 rounded-xl"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="maxMembers" className="text-white/80 text-sm font-medium">
+                                                Maximum Members
+                                            </Label>
+                                            <Input
+                                                id="maxMembers"
+                                                type="number"
+                                                min="1"
+                                                value={clubData.maxMembers}
+                                                onChange={(e) =>
+                                                    setClubData((prev) => ({
+                                                        ...prev,
+                                                        maxMembers: Number.parseInt(e.target.value)
+                                                    }))
+                                                }
+                                                className="bg-zinc-800/50 border-white/10 text-white focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-white/80 text-sm font-medium">Membership Fee</Label>
+                                            <div className="flex gap-2">
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    value={clubData.membershipFee}
+                                                    onChange={(e) =>
+                                                        setClubData((prev) => ({
+                                                            ...prev,
+                                                            membershipFee: Number.parseFloat(e.target.value)
+                                                        }))
+                                                    }
+                                                    className="bg-zinc-800/50 border-white/10 text-white focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
+                                                />
+                                                <Select
+                                                    value={clubData.feeType}
+                                                    onValueChange={(value) => setClubData((prev) => ({
+                                                        ...prev,
+                                                        feeType: value
+                                                    }))}
+                                                >
+                                                    <SelectTrigger
+                                                        className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl w-32">
+                                                        <SelectValue/>
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="weekly">Weekly</SelectItem>
+                                                        <SelectItem value="monthly">Monthly</SelectItem>
+                                                        <SelectItem value="yearly">Yearly</SelectItem>
+                                                        <SelectItem value="one-time">One-time</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 3: Schedule */}
+                        {currentStep === 3 && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-white mb-2">Meeting Schedule</h3>
+                                    <p className="text-white/60">When does your club typically meet or train?</p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-white/80 text-sm font-medium">Meeting Days *</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {days.map((day) => (
+                                                <Badge
+                                                    key={day}
+                                                    variant={clubData.meetingDays.includes(day) ? "default" : "outline"}
+                                                    className={`cursor-pointer transition-all duration-200 ${
+                                                        clubData.meetingDays.includes(day)
+                                                            ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                                                            : "bg-zinc-800/50 text-white/70 border-white/20 hover:bg-zinc-800"
+                                                    }`}
+                                                    onClick={() => handleDayToggle(day)}
+                                                >
+                                                    {day.slice(0, 3)}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="meetingTime" className="text-white/80 text-sm font-medium">
+                                                Typical Meeting Time *
+                                            </Label>
+                                            <Input
+                                                id="meetingTime"
+                                                type="time"
+                                                value={clubData.meetingTime}
+                                                onChange={(e) => setClubData((prev) => ({
+                                                    ...prev,
+                                                    meetingTime: e.target.value
+                                                }))}
+                                                className="bg-zinc-800/50 border-white/10 text-white focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-white/80 text-sm font-medium">Session
+                                                Duration</Label>
+                                            <Select>
+                                                <SelectTrigger
+                                                    className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
+                                                    <SelectValue placeholder="Select duration"/>
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="30">30 minutes</SelectItem>
+                                                    <SelectItem value="60">1 hour</SelectItem>
+                                                    <SelectItem value="90">1.5 hours</SelectItem>
+                                                    <SelectItem value="120">2 hours</SelectItem>
+                                                    <SelectItem value="180">3 hours</SelectItem>
+                                                    <SelectItem value="custom">Custom</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 4: Settings */}
+                        {currentStep === 4 && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-white mb-2">Club Settings</h3>
+                                    <p className="text-white/60">Set up privacy and member preferences</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-white/80 text-sm font-medium">Club Privacy</Label>
+                                        <Select
+                                            value={clubData.privacy}
+                                            onValueChange={(value) => setClubData((prev) => ({
+                                                ...prev,
+                                                privacy: value
+                                            }))}
+                                        >
+                                            <SelectTrigger
+                                                className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
+                                                <SelectValue/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="public">Public - Anyone can find and
+                                                    join</SelectItem>
+                                                <SelectItem value="restricted">Restricted - Approval required to
+                                                    join</SelectItem>
+                                                <SelectItem value="private">Private - Invitation only</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white/80 text-sm font-medium">Skill Level *</Label>
+                                        <Select
+                                            value={clubData.skillLevel}
+                                            onValueChange={(value) => setClubData((prev) => ({
+                                                ...prev,
+                                                skillLevel: value
+                                            }))}
+                                        >
+                                            <SelectTrigger
+                                                className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
+                                                <SelectValue placeholder="Select skill level"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="beginner">Beginner - New to the sport</SelectItem>
+                                                <SelectItem value="intermediate">Intermediate - Some
+                                                    experience</SelectItem>
+                                                <SelectItem value="advanced">Advanced - Experienced players</SelectItem>
+                                                <SelectItem value="mixed">Mixed - All skill levels welcome</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white/80 text-sm font-medium">Age Group *</Label>
+                                        <Select
+                                            value={clubData.ageGroup}
+                                            onValueChange={(value) => setClubData((prev) => ({
+                                                ...prev,
+                                                ageGroup: value
+                                            }))}
+                                        >
+                                            <SelectTrigger
+                                                className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
+                                                <SelectValue placeholder="Select age group"/>
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="youth">Youth (Under 18)</SelectItem>
+                                                <SelectItem value="adult">Adult (18-50)</SelectItem>
+                                                <SelectItem value="senior">Senior (50+)</SelectItem>
+                                                <SelectItem value="all-ages">All Ages Welcome</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white/80 text-sm font-medium">Auto-approve
+                                            Members</Label>
+                                        <div className="flex items-center space-x-2 pt-2">
+                                            <Switch
+                                                id="auto-approve"
+                                                checked={clubData.privacy === "public"}
+                                                onCheckedChange={(checked) =>
+                                                    setClubData((prev) => ({
+                                                        ...prev,
+                                                        privacy: checked ? "public" : "restricted"
+                                                    }))
+                                                }
+                                            />
+                                            <Label htmlFor="auto-approve" className="text-sm text-white/70">
+                                                Automatically approve new member requests
+                                            </Label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 5: Branding */}
+                        {currentStep === 5 && (
+                            <div className="space-y-6">
+                                <div className="text-center mb-6">
+                                    <h3 className="text-xl font-bold text-white mb-2">Club Branding</h3>
+                                    <p className="text-white/60">Add images and social media links (optional)</p>
+                                </div>
+
+                                <div className="space-y-6">
+                                    {/* Images */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-4">
+                                            <Label>Club Logo</Label>
+                                            <div
+                                                className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                                <div
+                                                    className="h-20 w-20 mx-auto mb-4 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
+                                                    {clubData.name.charAt(0) || "C"}
+                                                </div>
+                                                <Button variant="outline" size="sm"
+                                                        className="border-white/10 hover:bg-white/5">
+                                                    <Upload className="mr-2 h-4 w-4"/>
+                                                    Upload Logo
+                                                </Button>
+                                                <p className="text-xs text-white/50 mt-2">PNG, JPG up to 2MB</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <Label>Cover Image</Label>
+                                            <div
+                                                className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
+                                                <div
+                                                    className="h-32 w-full mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
+                                                    <span className="text-white/60">Cover Image Preview</span>
+                                                </div>
+                                                <Button variant="outline" size="sm"
+                                                        className="border-white/10 hover:bg-white/5">
+                                                    <Upload className="mr-2 h-4 w-4"/>
+                                                    Upload Cover
+                                                </Button>
+                                                <p className="text-xs text-white/50 mt-2">PNG, JPG up to 5MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Social Media */}
+                                    <div className="space-y-4">
+                                        <Label className="text-white/80 text-sm font-medium">Social Media Links
+                                            (Optional)</Label>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="facebook" className="text-sm text-white/60">
+                                                    Facebook
+                                                </Label>
+                                                <Input
+                                                    id="facebook"
+                                                    type="url"
+                                                    placeholder="https://facebook.com/yourclub"
+                                                    value={clubData.socialMedia.facebook}
+                                                    onChange={(e) =>
+                                                        setClubData((prev) => ({
+                                                            ...prev,
+                                                            socialMedia: {
+                                                                ...prev.socialMedia,
+                                                                facebook: e.target.value
+                                                            },
+                                                        }))
+                                                    }
+                                                    className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="instagram" className="text-sm text-white/60">
+                                                    Instagram
+                                                </Label>
+                                                <Input
+                                                    id="instagram"
+                                                    type="url"
+                                                    placeholder="https://instagram.com/yourclub"
+                                                    value={clubData.socialMedia.instagram}
+                                                    onChange={(e) =>
+                                                        setClubData((prev) => ({
+                                                            ...prev,
+                                                            socialMedia: {
+                                                                ...prev.socialMedia,
+                                                                instagram: e.target.value
+                                                            },
+                                                        }))
+                                                    }
+                                                    className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="twitter" className="text-sm text-white/60">
+                                                    Twitter
+                                                </Label>
+                                                <Input
+                                                    id="twitter"
+                                                    type="url"
+                                                    placeholder="https://twitter.com/yourclub"
+                                                    value={clubData.socialMedia.twitter}
+                                                    onChange={(e) =>
+                                                        setClubData((prev) => ({
+                                                            ...prev,
+                                                            socialMedia: {...prev.socialMedia, twitter: e.target.value},
+                                                        }))
+                                                    }
+                                                    className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between">
+                    <Button
+                        variant="outline"
+                        onClick={handlePrevious}
+                        disabled={currentStep === 1}
+                        className="border-white/10 hover:bg-white/5 text-white"
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4"/>
+                        Previous
+                    </Button>
+
+                    {currentStep < 5 ? (
+                        <Button onClick={handleNext} disabled={!isStepValid()}
+                                className="bg-white text-black hover:bg-white/90">
+                            Next
+                            <ArrowRight className="ml-2 h-4 w-4"/>
+                        </Button>
+                    ) : (
+                        <Button onClick={handleFinish} className="bg-emerald-500 text-white hover:bg-emerald-600">
+                            Create Club
+                            <Check className="ml-2 h-4 w-4"/>
+                        </Button>
+                    )}
+                </div>
+
+                {/* Skip Option */}
+                <div className="text-center mt-6">
+                    <Link href="/dashboard" className="text-white/60 hover:text-white/80 text-sm transition-colors">
+                        Skip and create later
+                    </Link>
+                </div>
+            </div>
+        </div>
+    )
+}

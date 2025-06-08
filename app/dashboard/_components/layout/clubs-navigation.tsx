@@ -59,7 +59,7 @@ export function ClubsNavigation({currentRole, clubs}: ClubsNavigationProps) {
                     ))}
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            <Link href={currentRole === "owner" ? "/dashboard/clubs/new" : "/dashboard/discover"}>
+                            <Link href={currentRole === "owner" ? "/dashboard/club/new" : "/dashboard/discover"}>
                                 <Plus className="h-4 w-4"/>
                                 <span>{currentRole === "owner" ? "Create New Club" : "Join More Clubs"}</span>
                             </Link>

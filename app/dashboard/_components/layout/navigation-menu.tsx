@@ -51,6 +51,7 @@ export function NavigationMenu({currentRole, currentPath}: NavigationMenuProps) 
             icon: Compass,
             active: currentPath === "/dashboard/discover",
         })
+        
     }
 
     return (

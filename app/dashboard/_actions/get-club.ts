@@ -2,6 +2,8 @@
 
 import {db} from "@/lib/db";
 import {Activity, Target, Users, Trophy} from "lucide-react";
+import {getCurrentUser} from "@/lib/helper/session";
+import {getUserById} from "@/data/user";
 
 export const getClub = async (id: string, userId: string) => {
     try {
@@ -113,3 +115,20 @@ export const getClub = async (id: string, userId: string) => {
     }
 }
 
+export const getClubByInviteCode = async (inviteCode: string) => {
+
+
+    const session = await getCurrentUser();
+    if (!session) return null;
+
+    const user = await getUserById(session.id!);
+    if (!user) return null;
+
+    const club = await db.club.findUnique({
+        where: {inviteCode: inviteCode,},
+    });
+
+    if (!club) return null;
+
+    return club;
+}

@@ -6,8 +6,6 @@ import {DashboardHeader} from "@/app/dashboard/_components/layout/dashboard-head
 import {getCurrentUser} from "@/lib/helper/session";
 import {getUserById} from "@/data/user";
 import {notFound} from "next/navigation";
-import {getUserClubs} from "./_actions/user-data";
-
 
 export default async function DashboardLayout({children}: { children: ReactNode }) {
 
@@ -18,14 +16,9 @@ export default async function DashboardLayout({children}: { children: ReactNode 
 
     // This would come from your auth/state management
     const currentRole: "owner" | "member" = user.dashboardView === "owner" || user.dashboardView === "member" ? user.dashboardView : "member";
-    const [ownedClubs, memberClubs] = await Promise.all([
-        getUserClubs(user.id, "owner"),
-        getUserClubs(user.id, "member"),
-    ]);
 
-    const userRoles: ("owner" | "member")[] = [];
-    if (ownedClubs && ownedClubs.length > 0) userRoles.push("owner");
-    if (memberClubs && memberClubs.length > 0) userRoles.push("member");
+
+    const userRoles = ["owner", "member"] // User can be both
 
     return (
         <div className="min-h-screen bg-black text-white">
