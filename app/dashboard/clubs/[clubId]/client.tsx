@@ -12,7 +12,6 @@ import {
     Trophy,
     Target,
     Activity,
-    LucideIcon
 } from "lucide-react"
 
 import {Button} from "@/components/ui/button"
@@ -63,7 +62,7 @@ interface CustomStat {
     label: string;
     value: string;
     unit: string;
-    icon: LucideIcon;
+    icon: string;
 }
 
 interface PricingOption {

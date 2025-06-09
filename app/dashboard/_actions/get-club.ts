@@ -38,17 +38,13 @@ export const getClub = async (id: string, userId: string) => {
 
         const customStats = club.customStats.map((stat, index) => {
             const iconKey = stat.icon ? stat.icon.toLowerCase() : ""
-            const icon =
-                iconKey && iconKey in iconMap
-                    ? iconMap[iconKey as IconKey]
-                    : Users // fallback icon
 
             return {
                 id: index + 1,
                 label: stat.label,
                 value: stat.value,
                 unit: stat.unit,
-                icon,
+                icon: stat.icon || "users",
             }
         })
 
@@ -223,7 +219,6 @@ export const getClubById = async (id: string) => {
 }
 
 export const getClubByInviteCode = async (inviteCode: string) => {
-
 
     const session = await getCurrentUser();
     if (!session) return null;

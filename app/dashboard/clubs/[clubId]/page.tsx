@@ -18,6 +18,8 @@ export default async function ClubManagementPage({params}: { params: Promise<{ c
 
     const club = await getClub(resolvedParams.clubId, user.id);
 
+    console.log(club)
+
     if (!club) return <div className="p-6">Club not found</div>;
 
     return <ClubManagementClient club={club} clubId={resolvedParams.clubId}/>;
