@@ -1,7 +1,6 @@
 "use client"
 
 import {useState} from "react"
-import {notFound, useParams} from "next/navigation"
 import {
     Users,
     Calendar,
@@ -103,10 +102,7 @@ interface ClubManagementClientProps {
 
 export default function ClubManagementClient({club, clubId}: ClubManagementClientProps) {
 
-
-    const params = useParams()
     const [activeTab, setActiveTab] = useState("overview")
-
 
     return (
         <div className="p-6 space-y-6">
@@ -127,8 +123,7 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                             className="h-16 w-16 rounded-xl bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
                             {club.name.charAt(0)}
                         </div>
-                    )
-                    }
+                    )}
 
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">{club.name}</h1>

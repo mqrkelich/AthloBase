@@ -8,6 +8,7 @@ import {Label} from "@/components/ui/label"
 import {Button} from "@/components/ui/button"
 import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 import {UploadButton} from "@/lib/uploadthing";
+import {toast} from "sonner"
 
 interface BrandingStepProps {
     clubData: ClubData
@@ -62,10 +63,9 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                                         allowedContent: "hidden"
                                     }}
                                     onClientUploadComplete={(res) => {
-                                        console.log("Files: ", res);
-                                        alert("Upload Completed");
 
-                                        setLogo(res[0]?.ufsUrl); // Assuming res[0] contains the uploaded file info
+                                        toast.success("Logo uploaded successfully!");
+                                        setLogo(res[0]?.ufsUrl);
                                         setClubData((prev) => ({
                                             ...prev,
                                             logo: res[0]?.ufsUrl // Update clubData with the uploaded logo URL
@@ -73,7 +73,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
 
                                     }}
                                     onUploadError={(error: Error) => {
-                                        alert(`ERROR! ${error.message}`);
+                                        toast.error(`Failed to upload the logo.`);
                                     }}
                                 />
                             </Button>
@@ -115,9 +115,9 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                                     }}
                                     onClientUploadComplete={(res) => {
                                         console.log("Files: ", res);
-                                        alert("Upload Completed");
 
-                                        setCoverImage(res[0]?.ufsUrl); // Assuming res[0] contains the uploaded file info
+                                        toast.success("Cover image uploaded successfully!");
+                                        setCoverImage(res[0]?.ufsUrl);
                                         setClubData((prev) => ({
                                             ...prev,
                                             coverImage: res[0]?.ufsUrl // Update clubData with the uploaded logo URL
@@ -125,7 +125,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
 
                                     }}
                                     onUploadError={(error: Error) => {
-                                        alert(`ERROR! ${error.message}`);
+                                        toast.error(`Failed to upload the cover image.`);
                                     }}
                                 />
                             </Button>

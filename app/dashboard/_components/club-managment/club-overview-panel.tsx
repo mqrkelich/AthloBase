@@ -122,62 +122,6 @@ export function ClubOverviewPanel({clubData}: ClubOverviewPanelProps) {
                 </CardContent>
             </Card>
 
-            {/* Recent Activity */}
-            <Card className="bg-zinc-900/50 border-white/10 text-white">
-                <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                    <CardDescription className="text-white/60">Latest updates and member activities</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {[
-                            {action: "New member joined", member: "Sarah Johnson", time: "2 hours ago", type: "join"},
-                            {action: "Event completed", event: "Morning Run", time: "1 day ago", type: "event"},
-                            {
-                                action: "Member achievement",
-                                member: "Mike Chen",
-                                achievement: "100 runs milestone",
-                                time: "2 days ago",
-                                type: "achievement",
-                            },
-                            {
-                                action: "New event created",
-                                event: "Weekend Trail Run",
-                                time: "3 days ago",
-                                type: "event"
-                            },
-                        ].map((activity, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <div
-                                        className={`h-2 w-2 rounded-full ${
-                                            activity.type === "join"
-                                                ? "bg-emerald-500"
-                                                : activity.type === "event"
-                                                    ? "bg-blue-500"
-                                                    : "bg-orange-500"
-                                        }`}
-                                    />
-                                    <div>
-                                        <p className="text-sm font-medium">{activity.action}</p>
-                                        <p className="text-xs text-white/60">
-                                            {activity.member && `${activity.member} • `}
-                                            {activity.event && `${activity.event} • `}
-                                            {activity.achievement && `${activity.achievement} • `}
-                                            {activity.time}
-                                        </p>
-                                    </div>
-                                </div>
-                                <Badge variant="outline" className="bg-white/5 text-white/60 border-white/10 text-xs">
-                                    {activity.type}
-                                </Badge>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Edit Stat Dialog */}
             {editingStat && (
                 <Dialog open={!!editingStat} onOpenChange={() => setEditingStat(null)}>
                     <StatDialog stat={editingStat} onSave={handleSaveStat} onCancel={() => setEditingStat(null)}/>

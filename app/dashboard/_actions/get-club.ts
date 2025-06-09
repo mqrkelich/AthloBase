@@ -115,6 +115,113 @@ export const getClub = async (id: string, userId: string) => {
     }
 }
 
+
+type Interval = "weekly" | "monthly" | "yearly";
+
+export const getClubById = async (id: string) => {
+    const club = await db.club.findUnique({
+        where: {id},
+        include: {
+            customStats: true,
+            pricing: {
+                include: {
+                    features: true,
+                },
+            },
+            clubMembers: true,
+        },
+    });
+
+    if (!club) return null;
+
+    const iconMap = {
+        activity: Activity,
+        target: Target,
+        users: Users,
+        trophy: Trophy,
+    }
+
+    const customStats = club.customStats.map((stat, index) => {
+        const iconKey = typeof stat.icon === "string" ? stat.icon.toLowerCase() : "";
+
+        const icon = iconMap[iconKey as keyof typeof iconMap] ?? Users;
+        return {
+            id: index + 1,
+            label: stat.label,
+            value: stat.value,
+            unit: stat.unit,
+            icon,
+        };
+    });
+
+    const pricing: Record<Interval, { name: string; price: number; features: string[] }> = {
+        weekly: {name: "", price: 0, features: []},
+        monthly: {name: "", price: 0, features: []},
+        yearly: {name: "", price: 0, features: []},
+    };
+
+    club.pricing.forEach((price) => {
+        if (["weekly", "monthly", "yearly"].includes(price.interval)) {
+            const interval = price.interval as Interval;
+            pricing[interval] = {
+                name: price.name,
+                price: price.price,
+                features: price.features.map((f) => f.description),
+            };
+        }
+    });
+
+    const members = await Promise.all(
+        club.clubMembers.map(async (member) => {
+            const user = await getUserById(member.userId);
+            if (!user) return null;
+            return {
+                id: user.id,
+                name: user.name || "Unknown User",
+                email: user.email,
+                image: user.image,
+                joined: member.createdAt || null
+            };
+        })
+    );
+
+    const ownerInfo = await getUserById(club.clubOwnerId);
+    const owner = ownerInfo ? {
+        id: ownerInfo.id,
+        name: ownerInfo.name || "Club Owner",
+        email: ownerInfo.email,
+        image: ownerInfo.image,
+        createdAt: ownerInfo.createdAt,
+    } : null;
+
+    return {
+        id: club.id,
+        name: club.name,
+        sport: club.sport,
+        description: club.description ?? "",
+        coverImage: club.image ?? "/placeholder.svg?height=200&width=800",
+        logo: club.logo ?? "/placeholder.svg?height=80&width=80",
+        memberCount: club.memberCount ?? 0,
+        activeEvents: club.activeEvents ?? 0,
+        privacy: club.privacy
+            .charAt(0)
+            .toUpperCase() + club.privacy.slice(1),
+        meetingDays: club.meetingDays ?? [],
+        meetingTime: club.meetingTime ?? "",
+        skillLevel: club.skillLevel ? club.skillLevel.charAt(0).toUpperCase() + club.skillLevel.slice(1) : "Mixed",
+        ageGroup: club.ageGroup ? club.ageGroup.charAt(0).toUpperCase() + club.ageGroup.slice(1) : "All Ages",
+        totalEvents: club.totalEvents ?? 0,
+        foundedDate: club.foundedDate ? club.foundedDate.toISOString().split("T")[0] : null,
+        location: club.location ?? "",
+        website: club.website ?? "",
+        members: members.filter(Boolean),
+        owner,
+        customStats,
+        pricing,
+    };
+
+}
+
 export const getClubByInviteCode = async (inviteCode: string) => {
 
 

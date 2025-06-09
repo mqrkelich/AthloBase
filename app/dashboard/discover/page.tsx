@@ -83,8 +83,6 @@ export default function DiscoverClubsPage() {
         setLoading(false)
     }
 
-
-
     const handleValidateCode = async () => {
         if (!inviteCode.trim()) return
 
@@ -185,7 +183,12 @@ export default function DiscoverClubsPage() {
                             <SelectItem value="mixed">Mixed</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" className="border-white/10 hover:bg-white/5 h-12 px-4">
+                    <Button onClick={() => {
+                        setSport('all');
+                        setSkill('all');
+                        setSearch('');
+                        setSort('recent');
+                    }} variant="outline" className="border-white/10 hover:bg-white/5 h-12 px-4">
                         <Filter className="h-4 w-4"/>
                     </Button>
                 </div>
