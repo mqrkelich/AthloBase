@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import {Search, MapPin, Users, Calendar, Star, ArrowRight, Filter, Plus, CheckCircle} from "lucide-react"
-import {useState} from "react"
+import {Search, MapPin, Users, Calendar, ArrowRight, Filter, Plus, CheckCircle} from "lucide-react"
+import {useEffect, useState} from "react"
 
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
@@ -24,110 +24,9 @@ import {toast} from "sonner";
 import {getClubByInviteCode} from "@/app/dashboard/_actions/get-club";
 import {useRouter} from "next/navigation";
 import {truncate} from "@/lib/utils";
-
-// Mock data for public clubs
-const publicClubs = [
-    {
-        id: "sunrise-runners",
-        name: "Sunrise Runners",
-        sport: "Running",
-        description:
-            "Early morning running group for fitness enthusiasts. We meet every weekday at 6 AM for a refreshing start to the day.",
-        location: "Central Park, NYC",
-        members: 124,
-        rating: 4.8,
-        meetingDays: ["Mon", "Tue", "Wed", "Thu", "Fri"],
-        skillLevel: "Mixed",
-        ageGroup: "Adult",
-        image: "/placeholder.svg?height=200&width=400",
-        owner: "Sarah Johnson",
-        recentActivity: "2 hours ago",
-        tags: ["Morning", "Fitness", "Community"],
-    },
-    {
-        id: "downtown-basketball",
-        name: "Downtown Basketball League",
-        sport: "Basketball",
-        description:
-            "Competitive basketball league for intermediate to advanced players. Weekly games and monthly tournaments.",
-        location: "Downtown Sports Complex",
-        members: 89,
-        rating: 4.6,
-        meetingDays: ["Wed", "Sat"],
-        skillLevel: "Intermediate",
-        ageGroup: "Adult",
-        image: "/placeholder.svg?height=200&width=400",
-        owner: "Mike Chen",
-        recentActivity: "1 day ago",
-        tags: ["Competitive", "League", "Tournament"],
-    },
-    {
-        id: "weekend-cyclists",
-        name: "Weekend Cyclists",
-        sport: "Cycling",
-        description:
-            "Casual cycling group exploring scenic routes around the city. Perfect for beginners and experienced cyclists alike.",
-        location: "Various Routes",
-        members: 67,
-        rating: 4.9,
-        meetingDays: ["Sat", "Sun"],
-        skillLevel: "Beginner",
-        ageGroup: "All Ages",
-        image: "/placeholder.svg?height=200&width=400",
-        owner: "Emma Davis",
-        recentActivity: "3 hours ago",
-        tags: ["Scenic", "Beginner-Friendly", "Weekend"],
-    },
-    {
-        id: "tennis-masters",
-        name: "Tennis Masters",
-        sport: "Tennis",
-        description: "Advanced tennis club for serious players. Regular coaching sessions and competitive matches.",
-        location: "Elite Tennis Center",
-        members: 45,
-        rating: 4.7,
-        meetingDays: ["Tue", "Thu", "Sat"],
-        skillLevel: "Advanced",
-        ageGroup: "Adult",
-        image: "/placeholder.svg?height=200&width=400",
-        owner: "David Wilson",
-        recentActivity: "5 hours ago",
-        tags: ["Advanced", "Coaching", "Competitive"],
-    },
-    {
-        id: "family-soccer",
-        name: "Family Soccer Club",
-        sport: "Soccer",
-        description:
-            "Fun soccer activities for families with children. Teaching kids the basics while parents can join in too!",
-        location: "Community Park Fields",
-        members: 156,
-        rating: 4.5,
-        meetingDays: ["Sat", "Sun"],
-        skillLevel: "Beginner",
-        ageGroup: "All Ages",
-        image: "/placeholder.svg?height=200&width=400",
-        owner: "Lisa Rodriguez",
-        recentActivity: "1 hour ago",
-        tags: ["Family", "Kids", "Fun"],
-    },
-    {
-        id: "swimming-enthusiasts",
-        name: "Swimming Enthusiasts",
-        sport: "Swimming",
-        description: "Swimming club for all levels. From learning strokes to competitive training, we welcome everyone.",
-        location: "Aquatic Center",
-        members: 78,
-        rating: 4.4,
-        meetingDays: ["Mon", "Wed", "Fri"],
-        skillLevel: "Mixed",
-        ageGroup: "Adult",
-        image: "/placeholder.svg?height=200&width=400",
-        owner: "Tom Anderson",
-        recentActivity: "4 hours ago",
-        tags: ["Swimming", "Training", "All Levels"],
-    },
-]
+import {getPublicClubs} from "@/app/dashboard/discover/_actions/get-public-clubs";
+import {getUserInitials} from "@/lib/helper/get-initials";
+import {sports} from "@/data/sports";
 
 export default function DiscoverClubsPage() {
     const [showInviteDialog, setShowInviteDialog] = useState(false)
@@ -141,7 +40,44 @@ export default function DiscoverClubsPage() {
         description: string
     } | null>(null)
 
+    const [clubs, setClubs] = useState<any[]>([])
+    const [totalClubs, setTotalClubs] = useState(0)
+    const [page, setPage] = useState(1)
+    const [hasMore, setHasMore] = useState(true)
+
     const [doesExist, setDoesExist] = useState(true)
+    const [loading, setLoading] = useState(false)
+
+    const [sport, setSport] = useState<string | undefined>('all')
+    const [skill, setSkill] = useState<string | undefined>('all')
+    const [sort, setSort] = useState<"recent" | "popular" | "members">("recent")
+
+    useEffect(() => {
+        // Reload clubs when filters or sort change
+        loadClubs(1, true)
+    }, [sport, skill, sort])
+
+    const loadClubs = async (pageToLoad: number, reset = false) => {
+        if (loading) return
+        setLoading(true)
+
+
+        const result = await getPublicClubs({
+            page: pageToLoad,
+            per_page: 1,
+            sport,
+            skill,
+            sort,
+        })
+
+        setClubs((prev) => (reset ? result.clubs : [...prev, ...result.clubs]))
+        setTotalClubs(result.total || 0)
+        setPage(result.nextPage ?? pageToLoad + 1)
+        setHasMore(result.hasMore)
+        setLoading(false)
+    }
+
+
 
     const handleValidateCode = async () => {
         if (!inviteCode.trim()) return
@@ -218,21 +154,19 @@ export default function DiscoverClubsPage() {
                     />
                 </div>
                 <div className="flex gap-2">
-                    <Select>
+                    <Select onValueChange={(val) => setSport(val === "all" ? undefined : val)}>
                         <SelectTrigger className="w-40 bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                             <SelectValue placeholder="Sport"/>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Sports</SelectItem>
-                            <SelectItem value="running">Running</SelectItem>
-                            <SelectItem value="basketball">Basketball</SelectItem>
-                            <SelectItem value="cycling">Cycling</SelectItem>
-                            <SelectItem value="tennis">Tennis</SelectItem>
-                            <SelectItem value="soccer">Soccer</SelectItem>
-                            <SelectItem value="swimming">Swimming</SelectItem>
+                            {sports.map((sport) => (
+                                <SelectItem key={sport} value={sport}>
+                                    {sport}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
-                    <Select>
+                    <Select onValueChange={(val) => setSkill(val === "all" ? undefined : val)}>
                         <SelectTrigger className="w-40 bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                             <SelectValue placeholder="Skill Level"/>
                         </SelectTrigger>
@@ -252,15 +186,14 @@ export default function DiscoverClubsPage() {
 
             {/* Results Count */}
             <div className="flex items-center justify-between">
-                <p className="text-white/60">Found {publicClubs.length} public clubs</p>
-                <Select defaultValue="recent">
+                <p className="text-white/60">Found {totalClubs} public clubs</p>
+                <Select value={sort} onValueChange={(val) => setSort(val as any)} defaultValue="recent">
                     <SelectTrigger className="w-48 bg-zinc-800/50 border-white/10 text-white">
                         <SelectValue/>
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="recent">Most Recent</SelectItem>
                         <SelectItem value="popular">Most Popular</SelectItem>
-                        <SelectItem value="rating">Highest Rated</SelectItem>
                         <SelectItem value="members">Most Members</SelectItem>
                     </SelectContent>
                 </Select>
@@ -268,7 +201,7 @@ export default function DiscoverClubsPage() {
 
             {/* Clubs Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {publicClubs.map((club) => (
+                {clubs.map((club) => (
                     <Card
                         key={club.id}
                         className="bg-zinc-900/50 border-white/10 text-white hover:border-white/20 transition-all duration-200 group"
@@ -276,10 +209,22 @@ export default function DiscoverClubsPage() {
                         <CardHeader className="pb-3">
                             <div className="flex items-start justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div
-                                        className="h-12 w-12 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold">
-                                        {club.name.charAt(0)}
-                                    </div>
+
+                                    {club.logo ? (
+                                        <div>
+                                            <img
+                                                src={club.logo}
+                                                alt={`${club.name} logo`}
+                                                className="h-16 w-16 rounded object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className="h-12 w-12 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                                            {club.name.charAt(0)}
+                                        </div>
+                                    )}
+
                                     <div>
                                         <CardTitle className="text-lg">{club.name}</CardTitle>
                                         <div className="flex items-center gap-2 mt-1">
@@ -287,10 +232,6 @@ export default function DiscoverClubsPage() {
                                                    className="bg-white/10 text-white/80 border-0 text-xs">
                                                 {club.sport}
                                             </Badge>
-                                            <div className="flex items-center gap-1">
-                                                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500"/>
-                                                <span className="text-xs text-white/60">{club.rating}</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -314,29 +255,17 @@ export default function DiscoverClubsPage() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-1">
-                                {club.tags.map((tag) => (
-                                    <Badge key={tag} variant="outline"
-                                           className="bg-white/5 text-white/60 border-white/10 text-xs">
-                                        {tag}
-                                    </Badge>
-                                ))}
-                            </div>
-
                             <div className="flex items-center gap-2 pt-2 border-t border-white/10">
                                 <Avatar className="h-6 w-6">
-                                    <AvatarImage src="/placeholder.svg?height=24&width=24" alt={club.owner}/>
+                                    <AvatarImage src={club.ownerImage} alt={club.owner}/>
                                     <AvatarFallback className="text-xs">
-                                        {club.owner
-                                            .split(" ")
-                                            .map((n) => n[0])
-                                            .join("")}
+                                        {getUserInitials(club.owner)}
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="text-xs text-white/60">
                                     <span>by {club.owner}</span>
                                     <span className="mx-1">•</span>
-                                    <span>Active {club.recentActivity}</span>
+                                    <span>Created {club.created}</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -355,14 +284,19 @@ export default function DiscoverClubsPage() {
                 ))}
             </div>
 
-            {/* Load More */}
-            <div className="text-center pt-8">
-                <Button variant="outline" className="border-white/10 hover:bg-white/5">
-                    Load More Clubs
-                </Button>
-            </div>
+            {hasMore && (
+                <div className="text-center pt-8">
+                    <Button
+                        variant="outline"
+                        className="border-white/10 hover:bg-white/5"
+                        disabled={loading}
+                        onClick={() => loadClubs(page)}
+                    >
+                        {loading ? "Loading..." : "Load More Clubs"}
+                    </Button>
+                </div>
+            )}
 
-            {/* Join with Invite Code Dialog */}
             <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
                 <DialogContent className="bg-zinc-900 border-white/10 text-white">
                     <DialogHeader>

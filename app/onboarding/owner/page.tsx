@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { createClub } from "../_actions/create-club"
 import { toast } from "sonner"
+import {sports} from "@/data/sports";
 
 
 type Step = 1 | 2 | 3 | 4
@@ -53,68 +54,6 @@ export default function OwnerOnboardingPage() {
         { number: 3, title: "Schedule", description: "Meeting times and frequency" },
         { number: 4, title: "Settings", description: "Privacy and member preferences" },
     ]
-
-    const sports = [
-        "Running",
-        "Basketball",
-        "Football",
-        "American Football",
-        "Tennis",
-        "Volleyball",
-        "Swimming",
-        "Cycling",
-        "Baseball",
-        "Softball",
-        "Golf",
-        "Badminton",
-        "Table Tennis",
-        "Acrobatic Rock n Roll Dance",
-        "Boxing",
-        "Wrestling",
-        "Karate",
-        "Judo",
-        "Taekwondo",
-        "MMA",
-        "Skateboarding",
-        "Surfing",
-        "Snowboarding",
-        "Skiing",
-        "Ice Hockey",
-        "Field Hockey",
-        "Lacrosse",
-        "Cricket",
-        "Rugby",
-        "Handball",
-        "Fencing",
-        "Archery",
-        "Rowing",
-        "Canoeing",
-        "Kayaking",
-        "Sailing",
-        "Equestrian",
-        "Climbing",
-        "Triathlon",
-        "Duathlon",
-        "Polo",
-        "Diving",
-        "Water Polo",
-        "Bobsledding",
-        "Luge",
-        "Skeleton",
-        "Speed Skating",
-        "Figure Skating",
-        "Darts",
-        "Bowling",
-        "Snooker",
-        "Pickleball",
-        "Disc Golf",
-        "Ultimate Frisbee",
-        "Parkour",
-        "Motocross",
-        "Auto Racing",
-        "Other",
-    ];
-
 
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
