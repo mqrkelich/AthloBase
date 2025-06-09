@@ -27,6 +27,7 @@ import {truncate} from "@/lib/utils";
 import {getPublicClubs} from "@/app/dashboard/discover/_actions/get-public-clubs";
 import {getUserInitials} from "@/lib/helper/get-initials";
 import {sports} from "@/data/sports";
+import {useDebounce} from "@/hooks/use-debounce";
 
 export default function DiscoverClubsPage() {
     const [showInviteDialog, setShowInviteDialog] = useState(false)
@@ -50,12 +51,16 @@ export default function DiscoverClubsPage() {
 
     const [sport, setSport] = useState<string | undefined>('all')
     const [skill, setSkill] = useState<string | undefined>('all')
-    const [sort, setSort] = useState<"recent" | "popular" | "members">("recent")
+    const [sort, setSort] = useState<"recent" | "members">("recent")
+    const [search, setSearch] = useState("")
+
+
+    const debouncedSearch = useDebounce(search, 300)
 
     useEffect(() => {
-        // Reload clubs when filters or sort change
         loadClubs(1, true)
-    }, [sport, skill, sort])
+    }, [sport, skill, sort, debouncedSearch])
+
 
     const loadClubs = async (pageToLoad: number, reset = false) => {
         if (loading) return
@@ -68,6 +73,7 @@ export default function DiscoverClubsPage() {
             sport,
             skill,
             sort,
+            search,
         })
 
         setClubs((prev) => (reset ? result.clubs : [...prev, ...result.clubs]))
@@ -149,6 +155,7 @@ export default function DiscoverClubsPage() {
                     <Search className="absolute left-3 top-3 h-4 w-4 text-white/50"/>
                     <Input
                         type="search"
+                        onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search clubs by name, sport, or location..."
                         className="pl-10 bg-zinc-800/50 border-white/10 focus-visible:ring-white/20 h-12 rounded-xl"
                     />
@@ -186,14 +193,13 @@ export default function DiscoverClubsPage() {
 
             {/* Results Count */}
             <div className="flex items-center justify-between">
-                <p className="text-white/60">Found {totalClubs} public clubs</p>
+                <p className="text-white/60">Found {totalClubs} public clubs in total across the platform</p>
                 <Select value={sort} onValueChange={(val) => setSort(val as any)} defaultValue="recent">
                     <SelectTrigger className="w-48 bg-zinc-800/50 border-white/10 text-white">
                         <SelectValue/>
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="recent">Most Recent</SelectItem>
-                        <SelectItem value="popular">Most Popular</SelectItem>
                         <SelectItem value="members">Most Members</SelectItem>
                     </SelectContent>
                 </Select>

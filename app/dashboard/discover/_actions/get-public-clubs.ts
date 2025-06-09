@@ -36,22 +36,21 @@ export const getPublicClubs = async ({
                                          sport,
                                          skill,
                                          sort = "recent",
+                                         search,
                                      }: {
     page?: number
     per_page?: number
     sport?: string
     skill?: string
-    sort?: "recent" | "popular" | "members"
+    sort?: "recent" | "members"
+    search?: string
 }) => {
     try {
         const skip = (page - 1) * per_page
         const take = per_page + 1
 
         const orderBy: any =
-            sort === "popular"
-                ? {rating: "desc" as const}
-                : sort === "members"
-                    ? {memberCount: "desc" as const}
+            sort === "members" ? {memberCount: "desc" as const}
                     : {createdAt: "desc" as const}
 
         if (sport === "all") sport = undefined;
@@ -62,6 +61,13 @@ export const getPublicClubs = async ({
                 privacy: "public",
                 ...(sport && {sport}),
                 ...(skill && {skillLevel: skill}),
+                ...(search && {
+                    OR: [
+                        {name: {contains: search, mode: "insensitive"}},
+                        {description: {contains: search, mode: "insensitive"}},
+                        {location: {contains: search, mode: "insensitive"}}
+                    ]
+                })
             },
             orderBy,
             skip,
