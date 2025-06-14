@@ -10,10 +10,10 @@ import {sports} from "@/data/sports";
 
 interface BasicInfoStepProps {
     clubData: ClubData
-    setClubData: React.Dispatch<React.SetStateAction<ClubData>>
+    setClubDataAction: React.Dispatch<React.SetStateAction<ClubData>>
 }
 
-export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
+export function BasicInfoStep({clubData, setClubDataAction}: BasicInfoStepProps) {
 
 
     return (
@@ -33,7 +33,7 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
                         type="text"
                         placeholder="e.g., City Runners, Metro Basketball Club"
                         value={clubData.name}
-                        onChange={(e) => setClubData((prev) => ({...prev, name: e.target.value}))}
+                        onChange={(e) => setClubDataAction((prev) => ({...prev, name: e.target.value}))}
                         className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
                     />
                 </div>
@@ -43,7 +43,7 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
                         Sport *
                     </Label>
                     <Select value={clubData.sport}
-                            onValueChange={(value) => setClubData((prev) => ({...prev, sport: value}))}>
+                            onValueChange={(value) => setClubDataAction((prev) => ({...prev, sport: value}))}>
                         <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                             <SelectValue placeholder="Select your sport"/>
                         </SelectTrigger>
@@ -66,7 +66,7 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
                         type="text"
                         placeholder="e.g., Central Park, Downtown Sports Center"
                         value={clubData.location}
-                        onChange={(e) => setClubData((prev) => ({...prev, location: e.target.value}))}
+                        onChange={(e) => setClubDataAction((prev) => ({...prev, location: e.target.value}))}
                         className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
                     />
                 </div>
@@ -80,7 +80,7 @@ export function BasicInfoStep({clubData, setClubData}: BasicInfoStepProps) {
                         type="url"
                         placeholder="https://yourclub.com"
                         value={clubData.website}
-                        onChange={(e) => setClubData((prev) => ({...prev, website: e.target.value}))}
+                        onChange={(e) => setClubDataAction((prev) => ({...prev, website: e.target.value}))}
                         className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
                     />
                 </div>

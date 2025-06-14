@@ -10,10 +10,10 @@ import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 
 interface DetailsStepProps {
     clubData: ClubData
-    setClubData: React.Dispatch<React.SetStateAction<ClubData>>
+    setClubDataAction: React.Dispatch<React.SetStateAction<ClubData>>
 }
 
-export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
+export function DetailsStep({clubData, setClubDataAction}: DetailsStepProps) {
     return (
         <div className="space-y-6">
             <div className="text-center mb-6">
@@ -30,7 +30,7 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                         id="description"
                         placeholder="Describe your club, its goals, and what makes it special..."
                         value={clubData.description}
-                        onChange={(e) => setClubData((prev) => ({...prev, description: e.target.value}))}
+                        onChange={(e) => setClubDataAction((prev) => ({...prev, description: e.target.value}))}
                         className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 min-h-32 rounded-xl"
                     />
 
@@ -50,7 +50,7 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                         id="rules"
                         placeholder="List any important rules, expectations, or guidelines for members..."
                         value={clubData.rules}
-                        onChange={(e) => setClubData((prev) => ({...prev, rules: e.target.value}))}
+                        onChange={(e) => setClubDataAction((prev) => ({...prev, rules: e.target.value}))}
                         className="bg-zinc-800/50 border-white/10 text-white placeholder:text-white/40 focus:border-white/30 focus:ring-white/20 min-h-24 rounded-xl"
                     />
                 </div>
@@ -65,7 +65,7 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                             type="number"
                             min="1"
                             value={clubData.maxMembers}
-                            onChange={(e) => setClubData((prev) => ({
+                            onChange={(e) => setClubDataAction((prev) => ({
                                 ...prev,
                                 maxMembers: Number.parseInt(e.target.value)
                             }))}
@@ -82,7 +82,7 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                                 step="0.01"
                                 placeholder="0.00"
                                 value={clubData.membershipFee}
-                                onChange={(e) => setClubData((prev) => ({
+                                onChange={(e) => setClubDataAction((prev) => ({
                                     ...prev,
                                     membershipFee: Number.parseFloat(e.target.value)
                                 }))}
@@ -91,7 +91,7 @@ export function DetailsStep({clubData, setClubData}: DetailsStepProps) {
                             <Select
                                 value={clubData.feeType}
                                 onValueChange={(value: "public" | "private" | "restricted") =>
-                                    setClubData((prev) => ({...prev, privacy: value}))
+                                    setClubDataAction((prev) => ({...prev, privacy: value}))
                                 }
                             >
                                 <SelectTrigger

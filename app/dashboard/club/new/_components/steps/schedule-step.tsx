@@ -5,19 +5,18 @@ import type React from "react"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Badge} from "@/components/ui/badge"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 
 interface ScheduleStepProps {
     clubData: ClubData
-    setClubData: React.Dispatch<React.SetStateAction<ClubData>>
+    setClubDataAction: React.Dispatch<React.SetStateAction<ClubData>>
 }
 
-export function ScheduleStep({clubData, setClubData}: ScheduleStepProps) {
+export function ScheduleStep({clubData, setClubDataAction}: ScheduleStepProps) {
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     const handleDayToggle = (day: string) => {
-        setClubData((prev) => ({
+        setClubDataAction((prev) => ({
             ...prev,
             meetingDays: prev.meetingDays.includes(day)
                 ? prev.meetingDays.filter((d) => d !== day)
@@ -62,7 +61,7 @@ export function ScheduleStep({clubData, setClubData}: ScheduleStepProps) {
                             id="meetingTime"
                             type="time"
                             value={clubData.meetingTime}
-                            onChange={(e) => setClubData((prev) => ({...prev, meetingTime: e.target.value}))}
+                            onChange={(e) => setClubDataAction((prev) => ({...prev, meetingTime: e.target.value}))}
                             className="bg-zinc-800/50 border-white/10 text-white focus:border-white/30 focus:ring-white/20 h-12 rounded-xl"
                         />
                     </div>

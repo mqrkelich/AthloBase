@@ -9,10 +9,10 @@ import {ClubData} from "@/app/dashboard/club/new/_hooks/use-club-creation";
 
 interface SettingsStepProps {
     clubData: ClubData
-    setClubData: React.Dispatch<React.SetStateAction<ClubData>>
+    setClubDataAction: React.Dispatch<React.SetStateAction<ClubData>>
 }
 
-export function SettingsStep({clubData, setClubData}: SettingsStepProps) {
+export function SettingsStep({clubData, setClubDataAction}: SettingsStepProps) {
     return (
         <div className="space-y-6">
             <div className="text-center mb-6">
@@ -26,7 +26,7 @@ export function SettingsStep({clubData, setClubData}: SettingsStepProps) {
                     <Select
                         value={clubData.privacy}
                         onValueChange={(value: "public" | "private" | "restricted") =>
-                            setClubData((prev) => ({...prev, privacy: value}))
+                            setClubDataAction((prev) => ({...prev, privacy: value}))
                         }
                     >
                         <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
@@ -44,7 +44,7 @@ export function SettingsStep({clubData, setClubData}: SettingsStepProps) {
                     <Label className="text-white/80 text-sm font-medium">Skill Level *</Label>
                     <Select
                         value={clubData.skillLevel}
-                        onValueChange={(value) => setClubData((prev) => ({...prev, skillLevel: value}))}
+                        onValueChange={(value) => setClubDataAction((prev) => ({...prev, skillLevel: value}))}
                     >
                         <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                             <SelectValue placeholder="Select skill level"/>
@@ -62,7 +62,7 @@ export function SettingsStep({clubData, setClubData}: SettingsStepProps) {
                     <Label className="text-white/80 text-sm font-medium">Age Group *</Label>
                     <Select
                         value={clubData.ageGroup}
-                        onValueChange={(value) => setClubData((prev) => ({...prev, ageGroup: value}))}
+                        onValueChange={(value) => setClubDataAction((prev) => ({...prev, ageGroup: value}))}
                     >
                         <SelectTrigger className="bg-zinc-800/50 border-white/10 text-white h-12 rounded-xl">
                             <SelectValue placeholder="Select age group"/>
@@ -83,7 +83,7 @@ export function SettingsStep({clubData, setClubData}: SettingsStepProps) {
                             id="auto-approve"
                             checked={clubData.privacy === "public"}
                             onCheckedChange={(checked) =>
-                                setClubData((prev) => ({...prev, privacy: checked ? "public" : "restricted"}))
+                                setClubDataAction((prev) => ({...prev, privacy: checked ? "public" : "restricted"}))
                             }
                         />
                         <Label htmlFor="auto-approve" className="text-sm text-white/70">

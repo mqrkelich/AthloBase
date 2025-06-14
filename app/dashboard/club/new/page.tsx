@@ -35,15 +35,15 @@ export default function CreateClubPage() {
     const renderCurrentStep = () => {
         switch (currentStep) {
             case 1:
-                return <BasicInfoStep clubData={clubData} setClubData={setClubData}/>
+                return <BasicInfoStep clubData={clubData} setClubDataAction={setClubData}/>
             case 2:
-                return <DetailsStep clubData={clubData} setClubData={setClubData}/>
+                return <DetailsStep clubData={clubData} setClubDataAction={setClubData}/>
             case 3:
-                return <ScheduleStep clubData={clubData} setClubData={setClubData}/>
+                return <ScheduleStep clubData={clubData} setClubDataAction={setClubData}/>
             case 4:
-                return <SettingsStep clubData={clubData} setClubData={setClubData}/>
+                return <SettingsStep clubData={clubData} setClubDataAction={setClubData}/>
             case 5:
-                return <BrandingStep clubData={clubData} setClubData={setClubData}/>
+                return <BrandingStep clubData={clubData} setClubDataAction={setClubData}/>
             default:
                 return null
         }
@@ -75,9 +75,9 @@ export default function CreateClubPage() {
                 <CreateClubNavigation
                     currentStep={currentStep}
                     isStepValid={isStepValid(currentStep)}
-                    onPrevious={handlePrevious}
-                    onNext={handleNext}
-                    onFinish={handleFinish}
+                    onPreviousAction={handlePrevious}
+                    onNextAction={handleNext}
+                    onFinishAction={handleFinish}
                 />
 
             </div>

@@ -12,10 +12,10 @@ import {toast} from "sonner"
 
 interface BrandingStepProps {
     clubData: ClubData
-    setClubData: React.Dispatch<React.SetStateAction<ClubData>>
+    setClubDataAction: React.Dispatch<React.SetStateAction<ClubData>>
 }
 
-export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
+export function BrandingStep({clubData, setClubDataAction}: BrandingStepProps) {
 
     // state that shows if the club logo is uploaded
     const [logo, setLogo] = useState<string | undefined>(undefined);
@@ -66,7 +66,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
 
                                         toast.success("Logo uploaded successfully!");
                                         setLogo(res[0]?.ufsUrl);
-                                        setClubData((prev) => ({
+                                        setClubDataAction((prev) => ({
                                             ...prev,
                                             logo: res[0]?.ufsUrl // Update clubData with the uploaded logo URL
                                         }));
@@ -118,7 +118,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
 
                                         toast.success("Cover image uploaded successfully!");
                                         setCoverImage(res[0]?.ufsUrl);
-                                        setClubData((prev) => ({
+                                        setClubDataAction((prev) => ({
                                             ...prev,
                                             coverImage: res[0]?.ufsUrl // Update clubData with the uploaded logo URL
                                         }));
@@ -149,7 +149,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                                 placeholder="https://facebook.com/yourclub"
                                 value={clubData.socialMedia.facebook}
                                 onChange={(e) =>
-                                    setClubData((prev) => ({
+                                    setClubDataAction((prev) => ({
                                         ...prev,
                                         socialMedia: {...prev.socialMedia, facebook: e.target.value},
                                     }))
@@ -167,7 +167,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                                 placeholder="https://instagram.com/yourclub"
                                 value={clubData.socialMedia.instagram}
                                 onChange={(e) =>
-                                    setClubData((prev) => ({
+                                    setClubDataAction((prev) => ({
                                         ...prev,
                                         socialMedia: {...prev.socialMedia, instagram: e.target.value},
                                     }))
@@ -185,7 +185,7 @@ export function BrandingStep({clubData, setClubData}: BrandingStepProps) {
                                 placeholder="https://twitter.com/yourclub"
                                 value={clubData.socialMedia.twitter}
                                 onChange={(e) =>
-                                    setClubData((prev) => ({
+                                    setClubDataAction((prev) => ({
                                         ...prev,
                                         socialMedia: {...prev.socialMedia, twitter: e.target.value},
                                     }))
