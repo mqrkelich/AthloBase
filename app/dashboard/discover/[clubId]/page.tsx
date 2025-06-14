@@ -160,7 +160,7 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                                                         <div
                                                             className="text-2xl font-bold text-emerald-500">{stat.value}
                                                             <span
-                                                                className="text-sm text-white/40 font-normal">{stat.unit}</span>
+                                                                className="text-sm text-white/40 font-normal"> {stat.unit}</span>
                                                         </div>
                                                         <div className="text-sm text-white/60">{stat.label}</div>
                                                     </div>

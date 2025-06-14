@@ -169,7 +169,6 @@ export function MemberManagement({clubId}: MemberManagementProps) {
                 </CardHeader>
             </Card>
 
-            {/* Filters and Search */}
             <Card className="bg-zinc-900/50 border-white/10 text-white">
                 <CardContent className="p-4">
                     <div className="flex flex-col md:flex-row gap-4">
@@ -214,7 +213,6 @@ export function MemberManagement({clubId}: MemberManagementProps) {
                 </CardContent>
             </Card>
 
-            {/* Members Table */}
             <Card className="bg-zinc-900/50 border-white/10 text-white">
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
@@ -327,7 +325,6 @@ export function MemberManagement({clubId}: MemberManagementProps) {
                 </CardContent>
             </Card>
 
-            {/* Pagination */}
             {totalPages > 1 && (
                 <Card className="bg-zinc-900/50 border-white/10 text-white">
                     <CardContent className="p-4">

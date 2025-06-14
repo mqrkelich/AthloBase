@@ -12,8 +12,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {sports} from "@/data/sports";
 import {UploadButton} from "@/lib/uploadthing";
 import {toast} from "sonner";
+import {updateClubAction} from "@/app/dashboard/clubs/_actions/club";
+import {useRouter} from "next/navigation"
 
 interface ClubData {
+    id: string
     name: string
     sport: string
     description: string
@@ -36,11 +39,27 @@ interface ClubInfoManagementProps {
 export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [formData, setFormData] = useState(clubData)
+    const router = useRouter();
 
-    const handleSave = () => {
-        // In real app, save to backend
-        console.log("Saving club data:", formData)
-        setIsEditing(false)
+    const handleSave = async () => {
+
+        if (!formData.name || !formData.sport || !formData.location) {
+            toast.error("Please fill in all required fields.")
+            return
+        }
+
+        await updateClubAction(clubData.id, formData)
+            .then((msg) => {
+                if (msg.error) {
+                    toast.error(msg.error);
+                    setIsEditing(false)
+                    return;
+                }
+
+                router.refresh();
+                setIsEditing(false)
+                toast.success("Club information updated successfully!");
+            })
     }
 
     const handleCancel = () => {
@@ -233,6 +252,10 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                             onClientUploadComplete={(res) => {
 
                                                 toast.success("Logo uploaded successfully!");
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    logo: res[0]?.ufsUrl,
+                                                }));
                                                 setLogo(res[0]?.ufsUrl);
 
                                             }}
@@ -281,6 +304,10 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                                 console.log("Files: ", res);
 
                                                 toast.success("Cover image uploaded successfully!");
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    coverImage: res[0]?.ufsUrl,
+                                                }));
                                                 setCoverImage(res[0]?.ufsUrl);
 
                                             }}

@@ -26,25 +26,17 @@ export async function createEvent(data: z.infer<typeof eventSchema>) {
     }
 
     const session = await getCurrentUser();
-    if (!session) {
-        return {error: "Unauthorized!"};
-    }
+    if (!session) return {error: "Unauthorized!"};
 
     const dbUser = await getUserById(session.id!);
-    if (!dbUser) {
-        return {error: "User not found."};
-    }
+    if (!dbUser) return {error: "User not found."};
 
     const club = await db.club.findUnique({
         where: {id: parsed.data.clubId},
     })
-    if (!club) {
-        return {error: "Club not found"}
-    }
 
-    if (club.clubOwnerId !== dbUser.id) {
-        return {error: "You are not authorized to create events for this club"};
-    }
+    if (!club) return {error: "Club not found"}
+    if (club.clubOwnerId !== dbUser.id) return {error: "You are not authorized to create events for this club"};
 
     const {
         clubId,

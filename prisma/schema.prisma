@@ -70,7 +70,7 @@ model Club {
   meetingTime String
   skillLevel  String
   ageGroup    String
-  foundedDate DateTime?
+  foundedDate String?
 
   rules      String?
   maxMembers Int?    @default(100)
