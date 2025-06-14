@@ -283,6 +283,7 @@ function EventDialog({onClose, clubId}: { onClose: () => void, clubId: string })
             return
         }
 
+        router.replace(`/dashboard/clubs/${clubId}/events`)
         toast.success("Event created successfully!")
         router.refresh()
         onClose()

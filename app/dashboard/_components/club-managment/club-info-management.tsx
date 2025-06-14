@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import React, {useState} from "react"
 import {Edit3, Upload, Save, X} from "lucide-react"
 
 import {Button} from "@/components/ui/button"
@@ -9,6 +9,9 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {sports} from "@/data/sports";
+import {UploadButton} from "@/lib/uploadthing";
+import {toast} from "sonner";
 
 interface ClubData {
     name: string
@@ -18,6 +21,7 @@ interface ClubData {
     logo: string
     location: string
     website: string
+    foundedDate: string | null
     pricing: {
         weekly: { name: string; price: number; features: string[] }
         monthly: { name: string; price: number; features: string[] }
@@ -68,6 +72,9 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
         const features = formData.pricing[tier].features.filter((_, i) => i !== index)
         updatePricing(tier, "features", features)
     }
+
+    const [logo, setLogo] = useState<string | undefined>(clubData.logo);
+    const [coverImage, setCoverImage] = useState<string | undefined>(clubData.coverImage);
 
     return (
         <div className="space-y-6">
@@ -129,12 +136,11 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                     <SelectValue/>
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="Running">Running</SelectItem>
-                                    <SelectItem value="Basketball">Basketball</SelectItem>
-                                    <SelectItem value="Soccer">Soccer</SelectItem>
-                                    <SelectItem value="Tennis">Tennis</SelectItem>
-                                    <SelectItem value="Swimming">Swimming</SelectItem>
-                                    <SelectItem value="Cycling">Cycling</SelectItem>
+                                    {sports.map((sport) => (
+                                        <SelectItem key={sport} value={sport}>
+                                            {sport}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -154,6 +160,17 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                 id="website"
                                 value={formData.website}
                                 onChange={(e) => setFormData((prev) => ({...prev, website: e.target.value}))}
+                                disabled={!isEditing}
+                                className="bg-zinc-800/50 border-white/10 disabled:opacity-60"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="website">Founded</Label>
+                            <Input
+                                id="founded"
+                                value={formData.foundedDate || ""}
+                                onChange={(e) => setFormData((prev) => ({...prev, foundedDate: e.target.value}))}
                                 disabled={!isEditing}
                                 className="bg-zinc-800/50 border-white/10 disabled:opacity-60"
                             />
@@ -183,29 +200,94 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                         <div className="space-y-4">
                             <Label>Club Logo</Label>
                             <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                <div
-                                    className="h-20 w-20 mx-auto mb-4 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
-                                    {formData.name.charAt(0)}
-                                </div>
+
+                                {logo ? (
+                                    <img
+                                        src={logo}
+                                        alt="Club Logo"
+                                        className="h-20 w-20 mx-auto mb-4 rounded-lg object-cover"
+                                        style={{backgroundColor: "rgba(0, 0, 0, 0.1)"}}
+                                    />
+                                ) : (
+                                    <div
+                                        className="h-20 w-20 mx-auto mb-4 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl">
+                                        {clubData.name.charAt(0) || "C"}
+                                    </div>
+                                )}
+
                                 {isEditing && (
-                                    <Button variant="outline" size="sm" className="border-white/10 hover:bg-white/5">
+
+                                    <Button variant="outline" size="sm"
+                                            className="relative overflow-hidden border-white/10 hover:bg-white/5">
                                         <Upload className="mr-2 h-4 w-4"/>
                                         Upload Logo
+
+                                        <UploadButton
+                                            className="absolute inset-0 opacity-0 cursor-pointer"
+                                            endpoint="logoUploader"
+                                            appearance={{
+                                                button: "relative overflow-hidden border-white/10 hover:bg-white/5",
+                                                container: "",
+                                                allowedContent: "hidden"
+                                            }}
+                                            onClientUploadComplete={(res) => {
+
+                                                toast.success("Logo uploaded successfully!");
+                                                setLogo(res[0]?.ufsUrl);
+
+                                            }}
+                                            onUploadError={(error: Error) => {
+                                                toast.error(`Failed to upload the logo.`);
+                                            }}
+                                        />
                                     </Button>
+
                                 )}
                             </div>
                         </div>
                         <div className="space-y-4">
                             <Label>Cover Image</Label>
                             <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
-                                <div
-                                    className="h-32 w-full mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
-                                    <span className="text-white/60">Cover Image Preview</span>
-                                </div>
+
+                                {coverImage ? (
+                                    <img
+                                        src={coverImage}
+                                        alt="Cover Image"
+                                        className="h-32 w-full mb-4 rounded-lg object-cover"
+                                        style={{backgroundColor: "rgba(0, 0, 0, 0.1)"}}
+                                    />
+                                ) : (
+                                    <div
+                                        className="h-32 w-full mb-4 rounded-lg bg-gradient-to-r from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
+                                        <span className="text-white/60">Cover Image Preview</span>
+                                    </div>
+                                )}
+
                                 {isEditing && (
-                                    <Button variant="outline" size="sm" className="border-white/10 hover:bg-white/5">
+                                    <Button variant="outline" size="sm"
+                                            className="relative overflow-hidden border-white/10 hover:bg-white/5">
                                         <Upload className="mr-2 h-4 w-4"/>
                                         Upload Cover
+
+                                        <UploadButton
+                                            className="absolute inset-0 opacity-0 cursor-pointer"
+                                            endpoint="coverUploader"
+                                            appearance={{
+                                                button: "relative overflow-hidden border-white/10 hover:bg-white/5",
+                                                container: "",
+                                                allowedContent: "hidden"
+                                            }}
+                                            onClientUploadComplete={(res) => {
+                                                console.log("Files: ", res);
+
+                                                toast.success("Cover image uploaded successfully!");
+                                                setCoverImage(res[0]?.ufsUrl);
+
+                                            }}
+                                            onUploadError={(error: Error) => {
+                                                toast.error(`Failed to upload the cover image.`);
+                                            }}
+                                        />
                                     </Button>
                                 )}
                             </div>

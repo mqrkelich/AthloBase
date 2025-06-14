@@ -75,9 +75,9 @@ model Club {
   rules      String?
   maxMembers Int?    @default(100)
 
-  memberCount  Int?
-  activeEvents Int?
-  totalEvents  Int?
+  memberCount  Int? @default(0)
+  activeEvents Int? @default(0)
+  totalEvents  Int? @default(0)
 
   instagram String?
   facebook  String?

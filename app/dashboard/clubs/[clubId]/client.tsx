@@ -10,8 +10,6 @@ import {
     Edit3,
     BarChart3,
     Trophy,
-    Target,
-    Activity,
 } from "lucide-react"
 
 import {Button} from "@/components/ui/button"
@@ -24,38 +22,6 @@ import {EventManagement} from "@/app/dashboard/_components/club-managment/event-
 import {ClubInfoManagement} from "@/app/dashboard/_components/club-managment/club-info-management";
 import {CustomFieldManagement} from "@/app/dashboard/_components/club-managment/custom-field-management";
 import {ExportReporting} from "@/app/dashboard/_components/club-managment/export-reporting";
-
-// Mock club data - in real app this would come from API
-const clubData = {
-    id: "city-runners",
-    name: "City Runners",
-    sport: "Running",
-    description: "A community of passionate runners training together in the city",
-    coverImage: "/placeholder.svg?height=200&width=800",
-    logo: "/placeholder.svg?height=80&width=80",
-    memberCount: 124,
-    activeEvents: 8,
-    totalEvents: 247,
-    foundedDate: "2019-03-15",
-    location: "Central Park, NYC",
-    website: "https://cityrunners.com",
-    customStats: [
-        {id: 1, label: "Total Runs", value: "1,247", unit: "runs", icon: Activity},
-        {id: 2, label: "Total Distance", value: "15,678", unit: "miles", icon: Target},
-        {id: 3, label: "Avg Attendance", value: "87", unit: "%", icon: Users},
-        {id: 4, label: "Longest Streak", value: "156", unit: "days", icon: Trophy},
-        {id: 5, label: "Active Members", value: "124", unit: "members", icon: Users},
-    ],
-    pricing: {
-        weekly: {name: "Weekly Pass", price: 15, features: ["Access to all sessions", "Basic support"]},
-        monthly: {name: "Monthly Membership", price: 50, features: ["Unlimited access", "Priority support", "Events"]},
-        yearly: {
-            name: "Annual Membership",
-            price: 500,
-            features: ["All benefits", "Premium support", "Exclusive events", "Merchandise"],
-        },
-    },
-}
 
 interface CustomStat {
     id: number;
@@ -101,7 +67,7 @@ interface ClubManagementClientProps {
 
 export default function ClubManagementClient({club, clubId}: ClubManagementClientProps) {
 
-    const [activeTab, setActiveTab] = useState("overview")
+    const [activeTab, setActiveTab] = useState("settings")
 
     return (
         <div className="p-6 space-y-6">
@@ -183,6 +149,8 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                         </div>
                     </CardContent>
                 </Card>
+
+                {club.foundedDate && (
                 <Card className="bg-zinc-900/50 border-white/10 text-white">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
@@ -194,6 +162,7 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                         </div>
                     </CardContent>
                 </Card>
+                )}
             </div>
 
             {/* Main Content Tabs */}
@@ -239,7 +208,7 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                     </TabsContent>
 
                     <TabsContent value="settings" className="space-y-6">
-                        <ClubInfoManagement clubData={clubData}/>
+                        <ClubInfoManagement clubData={club}/>
                     </TabsContent>
 
                     <TabsContent value="fields" className="space-y-6">
