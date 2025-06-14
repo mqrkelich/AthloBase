@@ -1,7 +1,7 @@
 "use client"
 
-import {useState} from "react"
-import {Calendar, Clock, MapPin, Users, Plus, Edit3, Trash2, Search} from "lucide-react"
+import {useEffect, useState} from "react"
+import {Calendar, Clock, MapPin, Users, Plus, Trash2, Search} from "lucide-react"
 
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
@@ -19,81 +19,44 @@ import {
 } from "@/components/ui/dialog"
 import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
-
-// Mock event data
-const mockEvents = [
-    {
-        id: 1,
-        title: "Morning Track Practice",
-        type: "Training",
-        date: "2024-06-15",
-        time: "06:00",
-        duration: 90,
-        location: "Central Park Track",
-        attendees: 23,
-        maxAttendees: 30,
-        status: "Scheduled",
-        recurring: "Weekly",
-        description: "High-intensity interval training session",
-        coach: "Emma Davis",
-    },
-    {
-        id: 2,
-        title: "Weekend Long Run",
-        type: "Training",
-        date: "2024-06-16",
-        time: "07:00",
-        duration: 120,
-        location: "Central Park Loop",
-        attendees: 18,
-        maxAttendees: 25,
-        status: "Scheduled",
-        recurring: "Weekly",
-        description: "Endurance building long distance run",
-        coach: "Sarah Johnson",
-    },
-    {
-        id: 3,
-        title: "Monthly Team Meeting",
-        type: "Meeting",
-        date: "2024-06-20",
-        time: "19:00",
-        duration: 60,
-        location: "Community Center",
-        attendees: 45,
-        maxAttendees: 50,
-        status: "Scheduled",
-        recurring: "Monthly",
-        description: "Club updates and planning session",
-        coach: "Sarah Johnson",
-    },
-    {
-        id: 4,
-        title: "5K Race Preparation",
-        type: "Competition",
-        date: "2024-06-22",
-        time: "08:00",
-        duration: 180,
-        location: "City Stadium",
-        attendees: 32,
-        maxAttendees: 40,
-        status: "Scheduled",
-        recurring: "None",
-        description: "Final preparation for upcoming 5K race",
-        coach: "Emma Davis",
-    },
-]
+import {createEvent, deleteEvent, getEventsByClub} from "@/app/dashboard/clubs/_actions/events";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 interface EventManagementProps {
     clubId: string
 }
 
+type ClubEvent = {
+    id: string
+    title: string
+    type: string
+    date: string | Date
+    time: string
+    duration: number
+    location: string
+    attendees: number
+    maxAttendees: number
+    status: string
+    recurring: string
+    description: string | null
+    coach: string | null
+    createdAt?: Date
+    updatedAt?: Date
+    clubId?: string
+}
+
 export function EventManagement({clubId}: EventManagementProps) {
-    const [events, setEvents] = useState(mockEvents)
     const [searchTerm, setSearchTerm] = useState("")
     const [typeFilter, setTypeFilter] = useState("all")
     const [statusFilter, setStatusFilter] = useState("all")
     const [isAddingEvent, setIsAddingEvent] = useState(false)
+    const [events, setEvents] = useState<ClubEvent[]>([])
+
+    useEffect(() => {
+        getEventsByClub(clubId)
+            .then((data) => setEvents(data || []))
+    }, [clubId])
 
     const filteredEvents = events.filter((event) => {
         const matchesSearch =
@@ -104,6 +67,18 @@ export function EventManagement({clubId}: EventManagementProps) {
 
         return matchesSearch && matchesType && matchesStatus
     })
+
+    const deleteEventHandler = async (eventId: string) => {
+        const response = await deleteEvent(clubId, eventId)
+
+        if (response.error) {
+            toast.error('Something went wrong while deleting the event.')
+            return
+        }
+
+        setEvents((prev) => prev.filter((event) => event.id !== eventId))
+        toast.success('Event deleted successfully!')
+    }
 
     const getTypeColor = (type: string) => {
         switch (type.toLowerCase()) {
@@ -149,7 +124,7 @@ export function EventManagement({clubId}: EventManagementProps) {
                                 Add Event
                             </Button>
                         </DialogTrigger>
-                        <EventDialog onClose={() => setIsAddingEvent(false)}/>
+                        <EventDialog onClose={() => setIsAddingEvent(false)} clubId={clubId}/>
                     </Dialog>
                 </CardHeader>
             </Card>
@@ -214,10 +189,8 @@ export function EventManagement({clubId}: EventManagementProps) {
                                     </div>
                                 </div>
                                 <div className="flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                        <Edit3 className="h-4 w-4"/>
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400">
+                                    <Button onClick={() => deleteEventHandler(event.id)} variant="ghost" size="icon"
+                                            className="h-8 w-8 text-red-400">
                                         <Trash2 className="h-4 w-4"/>
                                     </Button>
                                 </div>
@@ -273,7 +246,7 @@ export function EventManagement({clubId}: EventManagementProps) {
     )
 }
 
-function EventDialog({onClose}: { onClose: () => void }) {
+function EventDialog({onClose, clubId}: { onClose: () => void, clubId: string }) {
     const [formData, setFormData] = useState({
         title: "",
         type: "training",
@@ -287,9 +260,31 @@ function EventDialog({onClose}: { onClose: () => void }) {
         coach: "",
     })
 
-    const handleSubmit = () => {
-        // In real app, save event to backend
-        console.log("Creating event:", formData)
+    const router = useRouter()
+
+    const handleSubmit = async () => {
+        const {title, date, time, location} = formData
+
+        // Basic required field validation
+        if (!title || !date || !time || !location) {
+            toast.error("Please fill out all required fields.")
+            return
+        }
+
+        const result = await createEvent({
+            ...formData,
+            clubId,
+            duration: Number(formData.duration),
+            maxAttendees: Number(formData.maxAttendees),
+        })
+
+        if (result.error) {
+            toast.error("Something went wrong while creating the event.")
+            return
+        }
+
+        toast.success("Event created successfully!")
+        router.refresh()
         onClose()
     }
 

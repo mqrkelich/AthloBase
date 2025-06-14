@@ -53,6 +53,8 @@ export const createClubDashboard = async (
         };
     }
 
+
+    // Destructure validated fields for easier access
     const {
         name,
         sport,
@@ -71,6 +73,8 @@ export const createClubDashboard = async (
         socialMedia,
         pricing,
     } = validatedFields.data;
+
+    // Ensure coverImage is set to a default if not provided
 
     try {
         const inviteCode = await generateUniqueInviteCode();
@@ -100,6 +104,12 @@ export const createClubDashboard = async (
             },
         });
 
+        if (!club) {
+            return {error: "Failed to create club."};
+        }
+
+        // Create the club owner as a member with ADMIN role
+
         await db.clubMembers.create({
             data: {
                 userId: dbUser.id,
@@ -107,6 +117,8 @@ export const createClubDashboard = async (
                 role: "ADMIN",
             },
         });
+
+        // Create the club pricing
 
         await db.clubPricing.create({
             data: {
@@ -117,6 +129,8 @@ export const createClubDashboard = async (
             },
         });
 
+        // Update the user onboarding status and dashboard view
+
         await db.user.update({
             where: {id: dbUser.id},
             data: {
@@ -124,6 +138,8 @@ export const createClubDashboard = async (
                 dashboardView: "owner",
             },
         });
+
+        // Return the created club data
 
         return {success: true, club};
     } catch (err) {

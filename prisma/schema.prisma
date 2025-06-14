@@ -84,6 +84,7 @@ model Club {
   twitter   String?
 
   clubMembers ClubMembers[]
+  events Event[]
   customStats ClubStat[]
   pricing     ClubPricing[]
 }
@@ -129,4 +130,28 @@ model ClubPricingFeature {
   description String
 
   pricing ClubPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
+}
+
+model Event {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  clubId       String   @db.ObjectId
+  title        String
+  type         String // training, competition, meeting, etc.
+  date         DateTime
+  time         String // stored as "HH:mm" format
+  duration     Int // in minutes
+  location     String
+  attendees    Int      @default(0)
+  maxAttendees Int
+  status       String // scheduled, completed, cancelled
+  recurring    String // none, weekly, monthly, etc.
+  description  String?
+  coach        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  @@index([clubId])
 }
