@@ -67,7 +67,7 @@ interface ClubManagementClientProps {
 
 export default function ClubManagementClient({club, clubId}: ClubManagementClientProps) {
 
-    const [activeTab, setActiveTab] = useState("settings")
+    const [activeTab, setActiveTab] = useState("overview")
 
     return (
         <div className="p-6 space-y-6">
