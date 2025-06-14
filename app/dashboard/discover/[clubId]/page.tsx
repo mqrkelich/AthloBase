@@ -18,9 +18,11 @@ import {Separator} from "@/components/ui/separator"
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {getClubById} from "@/app/dashboard/_actions/get-club";
 import {formatDate} from "@/lib/utils"
+import {getEventsByClub} from "@/app/dashboard/clubs/_actions/events";
 
 export default async function ClubDetailPage({params}: { params: { clubId: string } }) {
     const club = await getClubById(params.clubId);
+
 
     if (!club || club.privacy !== "Public") {
         return (
@@ -30,6 +32,8 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
             </div>
         )
     }
+
+    const events = await getEventsByClub(club.id)
 
     return (
         <div className="p-6 space-y-8">
@@ -124,7 +128,9 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                     <Tabs defaultValue="about" className="w-full">
                         <TabsList className="bg-zinc-800/50 text-white/60">
                             <TabsTrigger value="about">About</TabsTrigger>
-                            <TabsTrigger value="events">Events</TabsTrigger>
+                            {events && events.length > 0 && (
+                                <TabsTrigger value="events">Events</TabsTrigger>
+                            )}
                             <TabsTrigger value="members">Members</TabsTrigger>
                         </TabsList>
 
@@ -152,7 +158,10 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                                                     <div key={stat.id}
                                                          className="bg-white/5 p-4 rounded-lg text-center">
                                                         <div
-                                                            className="text-2xl font-bold text-emerald-500">{stat.value}</div>
+                                                            className="text-2xl font-bold text-emerald-500">{stat.value}
+                                                            <span
+                                                                className="text-sm text-white/40 font-normal">{stat.unit}</span>
+                                                        </div>
                                                         <div className="text-sm text-white/60">{stat.label}</div>
                                                     </div>
                                                 ))}
@@ -164,7 +173,7 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                             </Card>
                         </TabsContent>
 
-                        {/*
+
                         <TabsContent value="events" className="mt-6">
                             <Card className="bg-zinc-900/50 border-white/10 text-white">
                                 <CardHeader>
@@ -173,7 +182,7 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-4">
-                                        {clubData.upcomingEvents.map((event) => (
+                                        {events.map((event) => (
                                             <div key={event.id} className="bg-white/5 p-4 rounded-lg">
                                                 <div className="flex items-start justify-between">
                                                     <div>
@@ -203,7 +212,7 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                                 </CardContent>
                             </Card>
                         </TabsContent>
-                        */}
+
 
                         <TabsContent value="members" className="mt-6">
                             <Card className="bg-zinc-900/50 border-white/10 text-white">
@@ -298,6 +307,14 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                             <div className="flex justify-between">
                                 <span className="text-white/60">Privacy</span>
                                 <span className="font-medium">{club.privacy}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-white/60">Founded</span>
+                                <span className="font-medium">{club.foundedDate || "N/A"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-white/60">Total Events</span>
+                                <span className="font-medium">{club.totalEvents}</span>
                             </div>
                         </CardContent>
                     </Card>

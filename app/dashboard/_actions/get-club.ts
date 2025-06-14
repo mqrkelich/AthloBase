@@ -40,7 +40,7 @@ export const getClub = async (id: string, userId: string) => {
             const iconKey = stat.icon ? stat.icon.toLowerCase() : ""
 
             return {
-                id: index + 1,
+                id: stat.id,
                 label: stat.label,
                 value: stat.value,
                 unit: stat.unit,

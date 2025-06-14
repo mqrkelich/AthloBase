@@ -24,7 +24,7 @@ import {CustomFieldManagement} from "@/app/dashboard/_components/club-managment/
 import {ExportReporting} from "@/app/dashboard/_components/club-managment/export-reporting";
 
 interface CustomStat {
-    id: number;
+    id: string;
     label: string;
     value: string;
     unit: string;

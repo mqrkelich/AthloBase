@@ -17,10 +17,11 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
-import {Badge} from "@/components/ui/badge"
+import {createClubStat, deleteClubStat, updateClubStat} from "@/app/dashboard/clubs/_actions/stat";
+import {toast} from "sonner"
 
 interface ClubStat {
-    id: number
+    id: string
     label: string
     value: string
     unit: string
@@ -29,7 +30,7 @@ interface ClubStat {
 
 interface ClubData {
     customStats: ClubStat[]
-
+    id: string
     [key: string]: any
 }
 
@@ -52,13 +53,20 @@ export function ClubOverviewPanel({clubData}: ClubOverviewPanelProps) {
     }
 
     const handleAddStat = (newStat: Omit<ClubStat, "id">) => {
-        const stat = {...newStat, id: Date.now()}
+        const stat = {...newStat, id: Date.now().toString()}  // id as string
         setStats((prev) => [...prev, stat])
         setIsAddingNew(false)
     }
 
-    const handleDeleteStat = (id: number) => {
-        setStats((prev) => prev.filter((s) => s.id !== id))
+    const handleDeleteStat = async (id: string) => {  // id as string here
+        await deleteClubStat(clubData.id, id).then((msg) => {
+            if (msg.error) {
+                toast.error(msg.error);
+                return;
+            }
+            toast.success(msg.success || "Statistic deleted successfully.");
+            setStats((prev) => prev.filter((s) => s.id !== id))
+        })
     }
 
     return (
@@ -78,7 +86,7 @@ export function ClubOverviewPanel({clubData}: ClubOverviewPanelProps) {
                                 Add Stat
                             </Button>
                         </DialogTrigger>
-                        <StatDialog onSave={handleAddStat} onCancel={() => setIsAddingNew(false)}/>
+                        <StatDialog clubId={clubData.id} onSave={handleAddStat} onCancel={() => setIsAddingNew(false)}/>
                     </Dialog>
                 </CardHeader>
                 <CardContent>
@@ -106,14 +114,16 @@ export function ClubOverviewPanel({clubData}: ClubOverviewPanelProps) {
                                                 </Button>
                                             </div>
                                         </div>
-                                        <div className="space-y-1">
-                                            <p className="text-2xl font-bold">
-                                                {stat.value}
-                                                <span
-                                                    className="text-sm font-normal text-white/60 ml-1">{stat.unit}</span>
-                                            </p>
-                                            <p className="text-sm text-white/70">{stat.label}</p>
+
+
+                                        <div key={stat.id}
+                                             className="text-center mt-[-20px]">
+                                            <div
+                                                className="text-2xl font-bold text-emerald-500">{stat.value} <span
+                                                className="text-sm text-white/40 font-normal">{stat.unit}</span></div>
+                                            <div className="text-sm text-white/60">{stat.label}</div>
                                         </div>
+
                                     </CardContent>
                                 </Card>
                             </div>
@@ -124,7 +134,8 @@ export function ClubOverviewPanel({clubData}: ClubOverviewPanelProps) {
 
             {editingStat && (
                 <Dialog open={!!editingStat} onOpenChange={() => setEditingStat(null)}>
-                    <StatDialog stat={editingStat} onSave={handleSaveStat} onCancel={() => setEditingStat(null)}/>
+                    <StatDialog clubId={clubData.id} stat={editingStat} onSave={handleSaveStat}
+                                onCancel={() => setEditingStat(null)}/>
                 </Dialog>
             )}
         </div>
@@ -135,9 +146,11 @@ function StatDialog({
                         stat,
                         onSave,
                         onCancel,
+                        clubId
                     }: {
     stat?: ClubStat
     onSave: (stat: any) => void
+    clubId: string
     onCancel: () => void
 }) {
     const [formData, setFormData] = useState({
@@ -155,15 +168,40 @@ function StatDialog({
         {name: "Clock", component: "Clock"},
     ]
 
-    const handleSubmit = () => {
-        const iconComponent = iconOptions.find((i) => i.name === formData.icon)?.component || "Activity"
-
-
-        onSave({
-            ...stat,
-            ...formData,
-            icon: eval(iconComponent), // In real app, use proper icon mapping
-        })
+    const handleSubmit = async () => {
+        try {
+            if (stat) {
+                // Editing existing stat
+                await updateClubStat({
+                    id: stat.id,
+                    clubId,
+                    label: formData.label,
+                    value: formData.value,
+                    unit: formData.unit,
+                    icon: formData.icon,
+                })
+                onSave({
+                    ...stat,
+                    ...formData,
+                })
+                toast.success("Statistic updated successfully.")
+            } else {
+                // Creating new stat
+                await createClubStat({
+                    clubId,
+                    label: formData.label,
+                    value: formData.value,
+                    unit: formData.unit,
+                    icon: formData.icon,
+                })
+                onSave({
+                    ...formData
+                })
+                toast.success("Statistic created successfully.")
+            }
+        } catch (error: any) {
+            toast.error(error?.message || "Failed to save statistic.")
+        }
     }
 
     return (
