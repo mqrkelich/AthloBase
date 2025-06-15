@@ -37,7 +37,7 @@ export default function Navbar({user}: NavbarProps) {
                 </Link>
                 <nav className="flex flex-1 items-center space-x-6 text-sm font-medium">
                     <Link href="/about" className="text-white/70 transition-colors hover:text-white">
-                        About Us
+                        About
                     </Link>
                     <Link target="_blank" href="https://github.com/mqrkelich/AthloBase/blob/main/README.md"
                           className="text-white/70 transition-colors hover:text-white">

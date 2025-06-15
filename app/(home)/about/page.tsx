@@ -1,10 +1,10 @@
-import Hero from "@/app/(home)/_components/hero";
-import Features from "@/app/(home)/_components/features";
-import HowItWorks from "@/app/(home)/_components/how-it-works";
+import AboutHero from "@/app/(home)/_components/about/about-hero";
+import Mission from "@/app/(home)/_components/about/mission";
+import Team from "@/app/(home)/_components/about/team";
+import Values from "@/app/(home)/_components/about/values";
 import CTA from "@/app/(home)/_components/cta";
 
-export default async function HomePage() {
-
+export default function AboutPage() {
     return (
         <div className="relative min-h-screen">
             <div className="pointer-events-none fixed inset-0">
@@ -14,9 +14,10 @@ export default async function HomePage() {
 
             <div className="relative z-10">
 
-            <Hero/>
-                <Features/>
-                <HowItWorks/>
+                <AboutHero/>
+                <Mission/>
+                <Team/>
+                <Values/>
                 <CTA/>
 
             </div>
