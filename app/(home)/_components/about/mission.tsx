@@ -44,13 +44,11 @@ export default function Mission() {
                     <h2 className="text-3xl font-bold text-white">My Story</h2>
                 </div>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                    AthloBase was born from my personal experience with the challenges facing sports organizations. As a
-                    developer
-                    with a passion for sports, I recognized the need for a comprehensive platform that could handle
-                    everything
-                    from membership management to event scheduling. I'm building AthloBase to be the solution I wish
-                    existed when
-                    I was involved in sports communities - intuitive, powerful, and built with real user needs in mind.
+                    AthloBase began during my time in the Neighborhood program, where I spent a month building real apps
+                    alongside other young developers. Inspired by my own experiences in sports communities, I set out to
+                    solve the messy, outdated systems clubs rely on. With a passion for both code and athletics, I
+                    created AthloBase — a sleek, modern platform built to make sports management simple, intuitive, and
+                    effective.
                 </p>
             </div>
         </section>
