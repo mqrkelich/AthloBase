@@ -1,22 +1,20 @@
 "use client"
 
-import type { HTMLAttributes } from "react"
 import Link from "next/link"
-
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
+import {Github, LogOut, Settings, User} from "lucide-react"
+import type {HTMLAttributes} from "react";
+import {signOutAction} from "@/actions/login";
 import {
     DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
+    DropdownMenuContent, DropdownMenuItem,
     DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LogOut, Settings, User } from "lucide-react"
-import {signOutAction} from "@/actions/login";
-import {getUserInitials} from "@/lib/helper/get-initials"
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {getUserInitials} from "@/lib/helper/get-initials";
 
-interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
+interface NavbarProps extends HTMLAttributes<HTMLDivElement> {
     user?: {
         id: string
         name: string
@@ -24,31 +22,37 @@ interface HeaderProps extends HTMLAttributes<HTMLDivElement> {
     }
 }
 
-export function Header({ user }: HeaderProps) {
+export default function Navbar({user}: NavbarProps) {
+
     const handleSignOut = async () => {
         await signOutAction();
     }
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 backdrop-blur-md bg-black/80">
-            <div className="container flex items-center justify-between h-16 px-4 md:px-6">
-                <Link href="/" className="flex items-center space-x-2">
-                    <span className="text-xl font-bold tracking-tight">AthloBase</span>
+        <header
+            className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container flex h-14 max-w-screen-2xl items-center">
+                <Link href="/" className="mr-6 flex items-center space-x-2">
+                    <span className="font-bold text-white">AthloBase</span>
                 </Link>
-
-                <nav className="hidden md:flex items-center gap-6">
-                    <Link href="#features" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-                        Features
+                <nav className="flex flex-1 items-center space-x-6 text-sm font-medium">
+                    <Link href="/about" className="text-white/70 transition-colors hover:text-white">
+                        About Us
                     </Link>
-                    <Link href="#about" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-                        About
-                    </Link>
-                    <Link href="#community" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
-                        Community
+                    <Link target="_blank" href="https://github.com/mqrkelich/AthloBase/blob/main/README.md"
+                          className="text-white/70 transition-colors hover:text-white">
+                        Documentation
                     </Link>
                 </nav>
+                <div className="flex items-center space-x-4">
+                    <Link href="https://github.com/mqrkelich/AthloBase" target="_blank" rel="noreferrer">
+                        <Button variant="ghost" size="icon"
+                                className="text-white/70 hover:text-white hover:bg-white/10">
+                            <Github className="h-4 w-4"/>
+                            <span className="sr-only">GitHub</span>
+                        </Button>
+                    </Link>
 
-                <div className="flex items-center gap-4">
                     {user ? (
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
@@ -65,7 +69,7 @@ export function Header({ user }: HeaderProps) {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                                 className="w-56 bg-black/90 border-white/10 backdrop-blur-md will-change-transform"
-                                style={{ transform: "translateZ(0)" }}
+                                style={{transform: "translateZ(0)"}}
                                 align="end"
                                 forceMount
                             >
@@ -75,28 +79,29 @@ export function Header({ user }: HeaderProps) {
                                         <p className="w-[200px] truncate text-sm text-white/70">Welcome back!</p>
                                     </div>
                                 </div>
-                                <DropdownMenuSeparator className="bg-white/10" />
+                                <DropdownMenuSeparator className="bg-white/10"/>
                                 <DropdownMenuItem asChild>
                                     <Link
                                         href="/dashboard"
                                         className="flex items-center gap-2 text-white hover:bg-white/10 cursor-pointer"
                                     >
-                                        <Settings className="h-4 w-4" />
+                                        <Settings className="h-4 w-4"/>
                                         Dashboard
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/profile" className="flex items-center gap-2 text-white hover:bg-white/10 cursor-pointer">
-                                        <User className="h-4 w-4" />
+                                    <Link href="/profile"
+                                          className="flex items-center gap-2 text-white hover:bg-white/10 cursor-pointer">
+                                        <User className="h-4 w-4"/>
                                         Profile
                                     </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator className="bg-white/10" />
+                                <DropdownMenuSeparator className="bg-white/10"/>
                                 <DropdownMenuItem
                                     className="flex items-center gap-2 text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
                                     onClick={handleSignOut}
                                 >
-                                    <LogOut className="h-4 w-4" />
+                                    <LogOut className="h-4 w-4"/>
                                     Sign Out
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -104,7 +109,8 @@ export function Header({ user }: HeaderProps) {
                     ) : (
                         <>
                             <Link href="/auth/login">
-                                <Button variant="ghost" className="text-white/70 hover:text-white">
+                                <Button variant="ghost" size="sm"
+                                        className="text-white/70 hover:text-white hover:bg-white/10">
                                     Log In
                                 </Button>
                             </Link>
@@ -113,6 +119,7 @@ export function Header({ user }: HeaderProps) {
                             </Link>
                         </>
                     )}
+
                 </div>
             </div>
         </header>
