@@ -1,6 +1,6 @@
 "use client"
 
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {Search, Download, Edit3, Eye, Trash2, MoreHorizontal, UserPlus} from "lucide-react"
 
 import {Button} from "@/components/ui/button"
@@ -19,88 +19,49 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Checkbox} from "@/components/ui/checkbox"
+import {getPaginatedMembers} from "../../_actions/get-members"
 
-// Mock member data
-const mockMembers = [
-    {
-        id: 1,
-        name: "Sarah Johnson",
-        email: "sarah@example.com",
-        role: "Admin",
-        status: "Active",
-        joinDate: "2023-01-15",
-        attendance: 92,
-        totalEvents: 45,
-        avatar: "/placeholder.svg?height=40&width=40",
-        phone: "+1 (555) 123-4567",
-        emergencyContact: "John Johnson - +1 (555) 987-6543",
-    },
-    {
-        id: 2,
-        name: "Mike Chen",
-        email: "mike@example.com",
-        role: "Member",
-        status: "Active",
-        joinDate: "2023-02-20",
-        attendance: 87,
-        totalEvents: 38,
-        avatar: "/placeholder.svg?height=40&width=40",
-        phone: "+1 (555) 234-5678",
-        emergencyContact: "Lisa Chen - +1 (555) 876-5432",
-    },
-    {
-        id: 3,
-        name: "Emma Davis",
-        email: "emma@example.com",
-        role: "Coach",
-        status: "Active",
-        joinDate: "2023-01-10",
-        attendance: 95,
-        totalEvents: 52,
-        avatar: "/placeholder.svg?height=40&width=40",
-        phone: "+1 (555) 345-6789",
-        emergencyContact: "David Davis - +1 (555) 765-4321",
-    },
-    {
-        id: 4,
-        name: "Alex Morgan",
-        email: "alex@example.com",
-        role: "Member",
-        status: "Inactive",
-        joinDate: "2023-03-05",
-        attendance: 45,
-        totalEvents: 12,
-        avatar: "/placeholder.svg?height=40&width=40",
-        phone: "+1 (555) 456-7890",
-        emergencyContact: "Sam Morgan - +1 (555) 654-3210",
-    },
-    {
-        id: 5,
-        name: "Taylor Reed",
-        email: "taylor@example.com",
-        role: "Member",
-        status: "Active",
-        joinDate: "2023-04-12",
-        attendance: 78,
-        totalEvents: 28,
-        avatar: "/placeholder.svg?height=40&width=40",
-        phone: "+1 (555) 567-8901",
-        emergencyContact: "Jordan Reed - +1 (555) 543-2109",
-    },
-]
+interface Member {
+    id: string
+    name: string
+    email: string
+    role: string
+    status: string
+    joinDate: string
+    attendance: number
+    totalEvents: number
+    avatar: string | null
+}
+
 
 interface MemberManagementProps {
     clubId: string
 }
 
 export function MemberManagement({clubId}: MemberManagementProps) {
-    const [members, setMembers] = useState(mockMembers)
+    const [members, setMembers] = useState<Member[]>([])
     const [searchTerm, setSearchTerm] = useState("")
     const [roleFilter, setRoleFilter] = useState("all")
     const [statusFilter, setStatusFilter] = useState("all")
-    const [selectedMembers, setSelectedMembers] = useState<number[]>([])
+    const [selectedMembers, setSelectedMembers] = useState<string[]>([])
     const [currentPage, setCurrentPage] = useState(1)
+    const [totalMembers, setTotalMembers] = useState(0)
+    const [loading, setLoading] = useState(true)
     const membersPerPage = 10
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true)
+            const res = await getPaginatedMembers(clubId, currentPage, membersPerPage)
+            setMembers(res.members)
+            setTotalMembers(res.total)
+            setLoading(false)
+        }
+
+        fetchData()
+    }, [clubId, currentPage])
+
+    const totalPages = Math.ceil(totalMembers / membersPerPage)
 
     // Filter members based on search and filters
     const filteredMembers = members.filter((member) => {
@@ -114,12 +75,15 @@ export function MemberManagement({clubId}: MemberManagementProps) {
     })
 
     // Pagination
-    const totalPages = Math.ceil(filteredMembers.length / membersPerPage)
     const startIndex = (currentPage - 1) * membersPerPage
     const paginatedMembers = filteredMembers.slice(startIndex, startIndex + membersPerPage)
 
-    const handleSelectMember = (memberId: number) => {
-        setSelectedMembers((prev) => (prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId]))
+    const handleSelectMember = (memberId: string) => {
+        setSelectedMembers((prev) =>
+            prev.includes(memberId)
+                ? prev.filter((id) => id !== memberId)
+                : [...prev, memberId]
+        )
     }
 
     const handleSelectAll = () => {
@@ -149,6 +113,16 @@ export function MemberManagement({clubId}: MemberManagementProps) {
 
     const getStatusColor = (status: string) => {
         return status === "Active" ? "bg-emerald-500/20 text-emerald-500" : "bg-orange-500/20 text-orange-500"
+    }
+
+    if (loading) {
+        return (
+            <Card className="bg-zinc-900/50 border-white/10 text-white">
+                <CardContent className="flex items-center justify-center h-64">
+                    <p className="text-white/60">Loading members...</p>
+                </CardContent>
+            </Card>
+        )
     }
 
     return (
@@ -270,7 +244,7 @@ export function MemberManagement({clubId}: MemberManagementProps) {
                                         <TableCell>
                                             <Badge variant="outline"
                                                    className={`border-0 ${getStatusColor(member.status)}`}>
-                                                {member.status}
+                                                {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell

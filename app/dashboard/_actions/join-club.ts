@@ -39,6 +39,7 @@ export const joinClubWithInvite = async (inviteCode: string) => {
         data: {
             clubId: club.id,
             userId: user.id,
+            status: "active",
         }
     });
 

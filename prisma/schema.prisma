@@ -96,6 +96,7 @@ model ClubMembers {
   clubId    String   @db.ObjectId
   role      UserRole @default(USER)
   createdAt DateTime @default(now())
+  status String? @default("active")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)

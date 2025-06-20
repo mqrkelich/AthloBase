@@ -1,0 +1,19 @@
+
+18/06/2025
+
+finished stuff:
+about page new club statistics, also on the right added founded, total events, finished the events tab now fully working.
+
+
+also added founded date now working
+
+on the dashboard/clubs finished the overview page, you can now add custom stats, edit them and delete them
+finished events tab, you can create events, filter and search them, and delete them, finished club settings now you can edit club settings fully working.
+
+next steps:
+
+finish members on the dashboard/clubs
+add pricing on the discover club page
+finish add member button on the dashboard clubs
+
+time for this: 4 hours

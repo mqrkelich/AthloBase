@@ -108,7 +108,7 @@ export const createClubDashboard = async (
             return {error: "Failed to create club."};
         }
 
-        // Create the club owner as a member with ADMIN role
+        // Create the club owner as a member with COACH role
 
         await db.clubMembers.create({
             data: {
