@@ -27,8 +27,6 @@ export const getPaginatedMembers = async (clubId: string, page: number, pageSize
 
     if (!club) return {members: [], total: 0}
 
-    // const user = await getUserById(member.userId)
-
     const members = await Promise.all(club.clubMembers.map(async (member) => {
 
         const user = await getUserById(member.userId)
@@ -38,7 +36,7 @@ export const getPaginatedMembers = async (clubId: string, page: number, pageSize
             name: user ? user.name || "Anonymous" : "Anonymous",
             email: user ? user.email || "No email" : "No email",
             role: member.role,
-            status: "active", // TODO: You can extend logic to pull real status
+            status: member.status || "active",
             joinDate: member.createdAt.toISOString(),
             attendance: 0, // TODO: Implement real attendance logic
             totalEvents: 0, // TODO: Implement real event tracking

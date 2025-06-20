@@ -14,6 +14,7 @@ import {UploadButton} from "@/lib/uploadthing";
 import {toast} from "sonner";
 import {updateClubAction} from "@/app/dashboard/clubs/_actions/club";
 import {useRouter} from "next/navigation"
+import {AddFeatureDialog} from "./add-feature-dialog"
 
 interface ClubData {
     id: string
@@ -80,12 +81,22 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
         }))
     }
 
-    const addFeature = (tier: "weekly" | "monthly" | "yearly") => {
-        const newFeature = prompt("Enter new feature:")
-        if (newFeature) {
-            updatePricing(tier, "features", [...formData.pricing[tier].features, newFeature])
-        }
+    const [featureDialogOpen, setFeatureDialogOpen] = useState(false)
+    const [selectedTier, setSelectedTier] = useState<"weekly" | "monthly" | "yearly" | null>(null)
+
+    const handleAddFeature = (tier: "weekly" | "monthly" | "yearly") => {
+        setSelectedTier(tier)
+        setFeatureDialogOpen(true)
     }
+
+    const handleFeatureSubmit = (featureData: { name: string; description: string }) => {
+        if (selectedTier) {
+            updatePricing(selectedTier, "features", [...formData.pricing[selectedTier].features, featureData.name])
+        }
+        setFeatureDialogOpen(false)
+        setSelectedTier(null)
+    }
+
 
     const removeFeature = (tier: "weekly" | "monthly" | "yearly", index: number) => {
         const features = formData.pricing[tier].features.filter((_, i) => i !== index)
@@ -259,7 +270,7 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                                 setLogo(res[0]?.ufsUrl);
 
                                             }}
-                                            onUploadError={(error: Error) => {
+                                            onUploadError={() => {
                                                 toast.error(`Failed to upload the logo.`);
                                             }}
                                         />
@@ -311,7 +322,7 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                                 setCoverImage(res[0]?.ufsUrl);
 
                                             }}
-                                            onUploadError={(error: Error) => {
+                                            onUploadError={() => {
                                                 toast.error(`Failed to upload the cover image.`);
                                             }}
                                         />
@@ -381,7 +392,7 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => addFeature(tier as any)}
+                                                    onClick={() => handleAddFeature(tier as any)}
                                                     className="border-white/10 hover:bg-white/5 w-full"
                                                 >
                                                     Add Feature
@@ -395,6 +406,14 @@ export function ClubInfoManagement({clubData}: ClubInfoManagementProps) {
                     </div>
                 </CardContent>
             </Card>
+
+            <AddFeatureDialog
+                open={featureDialogOpen}
+                onOpenChangeAction={setFeatureDialogOpen}
+                onSubmitAction={handleFeatureSubmit}
+                tierName={selectedTier ? `${selectedTier} membership` : ""}
+            />
+
         </div>
     )
 }
