@@ -22,6 +22,7 @@ import {EventManagement} from "@/app/dashboard/_components/club-managment/event-
 import {ClubInfoManagement} from "@/app/dashboard/_components/club-managment/club-info-management";
 import {CustomFieldManagement} from "@/app/dashboard/_components/club-managment/custom-field-management";
 import {ExportReporting} from "@/app/dashboard/_components/club-managment/export-reporting";
+import {InviteLinkDialog} from "@/app/dashboard/_components/club-managment/invite-link-dialog";
 
 interface CustomStat {
     id: string;
@@ -64,12 +65,13 @@ export interface Club {
 interface ClubManagementClientProps {
     club: Club;
     clubId: string;
+    webUrl?: string;
 }
 
-export default function ClubManagementClient({club, clubId}: ClubManagementClientProps) {
+export default function ClubManagementClient({club, clubId, webUrl}: ClubManagementClientProps) {
 
     const [activeTab, setActiveTab] = useState("overview")
-
+    const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
 
     return (
         <div className="p-6 space-y-6">
@@ -109,7 +111,7 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                         <Download className="mr-2 h-4 w-4"/>
                         Export Data
                     </Button>
-                    <Button>
+                    <Button onClick={() => setInviteDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4"/>
                         Add Member
                     </Button>
@@ -222,6 +224,16 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                     </TabsContent>
                 </div>
             </Tabs>
+
+            <InviteLinkDialog
+                open={inviteDialogOpen}
+                onOpenChangeAction={setInviteDialogOpen}
+                clubName={club.name}
+                clubId={club.id}
+                inviteCode={club.inviteCode || "default-invite-code"}
+                webUrl={webUrl || "http://localhost:3000"}
+            />
+
         </div>
     )
 }

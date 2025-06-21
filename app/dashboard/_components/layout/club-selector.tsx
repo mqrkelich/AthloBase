@@ -28,7 +28,6 @@ interface ClubSelectorProps {
 
 export function ClubSelector({currentRole, selectedClub, clubs}: ClubSelectorProps) {
     const filteredClubs = clubs.filter((club) => club.role === currentRole)
-    //const router = useRouter();
 
     const createNew = () => {
         if (currentRole === "owner") {

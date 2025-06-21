@@ -21,5 +21,5 @@ export default async function ClubManagementPage({params}: { params: Promise<{ c
     // If the club is not found, return a 404 page
     if (!club) return <div className="p-6">Club not found</div>;
 
-    return <ClubManagementClient club={club} clubId={resolvedParams.clubId}/>;
+    return <ClubManagementClient webUrl={process.env.WEB_URL} club={club} clubId={resolvedParams.clubId}/>;
 }
