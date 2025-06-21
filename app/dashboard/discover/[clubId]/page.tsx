@@ -35,6 +35,12 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
 
     const events = await getEventsByClub(club.id)
 
+    type Interval = "weekly" | "monthly" | "yearly";
+
+    const hasPricingPlanName = (["weekly", "monthly", "yearly"] as Interval[]).some(
+        (interval: Interval) => club.pricing?.[interval]?.name?.trim()
+    );
+
     return (
         <div className="p-6 space-y-8">
 
@@ -132,6 +138,9 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                                 <TabsTrigger value="events">Events</TabsTrigger>
                             )}
                             <TabsTrigger value="members">Members</TabsTrigger>
+                            {hasPricingPlanName && (
+                                <TabsTrigger value="pricing">Pricing</TabsTrigger>
+                            )}
                         </TabsList>
 
                         <TabsContent value="about" className="mt-6">
@@ -246,6 +255,54 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                                                 )}
                                             </div>
                                         ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+
+                        <TabsContent value="pricing" className="mt-6">
+                            <Card className="bg-zinc-900/50 border-white/10 text-white">
+                                <CardHeader>
+                                    <CardTitle>Pricing Plans</CardTitle>
+                                    <CardDescription className="text-white/60">
+                                        Choose a plan that fits your needs
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {(["weekly", "monthly", "yearly"] as const).map((interval) => {
+                                            const plan = club.pricing[interval];
+
+                                            if (!plan || !plan.name) return null;
+
+                                            return (
+                                                <div key={interval}
+                                                     className="bg-white/5 rounded-lg p-6 flex flex-col h-full">
+                                                    <div
+                                                        className="mb-2 text-lg font-semibold capitalize">{plan.name || interval}</div>
+                                                    <div className="text-3xl font-bold text-emerald-400 mb-4">
+                                                        ${plan.price}
+                                                        <span
+                                                            className="text-base text-white/60 font-normal"> /{interval}</span>
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <ul className="space-y-2 text-white/80 text-sm">
+                                                            {plan.features.length > 0 ? (
+                                                                plan.features.map((feature, idx) => (
+                                                                    <li key={idx} className="flex items-center gap-2">
+                                                                        <span
+                                                                            className="h-2 w-2 rounded-full bg-emerald-400 inline-block"/>
+                                                                        {feature}
+                                                                    </li>
+                                                                ))
+                                                            ) : (
+                                                                <li className="text-white/40">No features listed</li>
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </CardContent>
                             </Card>
