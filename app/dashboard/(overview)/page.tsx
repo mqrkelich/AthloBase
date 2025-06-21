@@ -12,6 +12,7 @@ import {DashboardActivityFeed} from "@/app/dashboard/(overview)/_components/dash
 import {DashboardQuickActions} from "@/app/dashboard/(overview)/_components/dashboard-quick-actions";
 import {DashboardMembersList} from "@/app/dashboard/(overview)/_components/dashboard-members-list";
 import InviteLink from "@/app/dashboard/(overview)/invite-link";
+import {getUserClubs} from "@/app/dashboard/_actions/user-data";
 
 
 export default async function DashboardPage() {
@@ -30,6 +31,19 @@ export default async function DashboardPage() {
         ? user.dashboardView
         : "member";
 
+    // Find the first club the user is part of
+    const userClubs = await getUserClubs(user.id, "owner");
+
+    const clubs = userClubs ? userClubs.map(club => ({
+        id: club.id,
+        name: club.name,
+        inviteCode: club.inviteCode,
+    })) : [];
+
+    const selectedClub =
+        clubs.find(club => club.id === user.selectedClubId) ||
+        clubs[0] ||
+        {id: "default", name: "Select a club", inviteCode: null};
 
     return (
         <div className="p-6 space-y-8">
@@ -54,7 +68,7 @@ export default async function DashboardPage() {
                                 </Link>
                             </Button>
 
-                            <InviteLink/>
+                            <InviteLink webUrl={process.env.WEB_URL || "http://localhost:3000"} club={selectedClub}/>
                         </>
                     ) : (
                         <>

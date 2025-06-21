@@ -6,8 +6,17 @@ import {InviteLinkDialog} from "@/app/dashboard/_components/club-managment/invit
 import {Button} from "@/components/ui/button";
 import {Plus} from "lucide-react";
 
+interface InviteLinkProps {
+    club: {
+        name: string
+        id: string
+        inviteCode: string | null
+    }
+    webUrl: string
+}
 
-export default function InviteLink() {
+
+export default function InviteLink({webUrl, club}: InviteLinkProps) {
 
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
 
@@ -22,10 +31,11 @@ export default function InviteLink() {
 
             <InviteLinkDialog
                 open={inviteDialogOpen}
-                onOpenChange={setInviteDialogOpen}
-                clubName="City Runners"
-                clubId="city-runners"
-                inviteCode="owner-id-123"
+                onOpenChangeAction={setInviteDialogOpen}
+                clubName={club.name}
+                clubId={club.id}
+                inviteCode={club.inviteCode || ""}
+                webUrl={webUrl}
             />
         </div>
     )

@@ -348,7 +348,7 @@ export function MemberManagement({clubId, club}: MemberManagementProps) {
 
             <InviteLinkDialog
                 open={inviteDialogOpen}
-                onOpenChange={setInviteDialogOpen}
+                onOpenChangeAction={setInviteDialogOpen}
                 clubName={club.name}
                 clubId={club.id}
                 inviteCode={club.inviteCode || "default-invite-code"}

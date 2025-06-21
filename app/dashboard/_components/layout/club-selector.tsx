@@ -11,6 +11,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {Badge} from "@/components/ui/badge"
+import {setSelectClub} from "../../_actions/switch-role"
+import {useRouter} from "next/navigation";
 
 interface Club {
     id: string
@@ -26,6 +28,7 @@ interface ClubSelectorProps {
 
 export function ClubSelector({currentRole, selectedClub, clubs}: ClubSelectorProps) {
     const filteredClubs = clubs.filter((club) => club.role === currentRole)
+    //const router = useRouter();
 
     const createNew = () => {
         if (currentRole === "owner") {
@@ -35,9 +38,12 @@ export function ClubSelector({currentRole, selectedClub, clubs}: ClubSelectorPro
         }
     }
 
-    const selectClub = (club: Club) => {
+    const selectClub = async (club: Club) => {
         if (currentRole === "owner") {
-            window.location.href = `/dashboard/clubs/${club.id}`
+            await setSelectClub(club.id);
+            window.location.reload();
+            // refresh the page to reflect the change
+
         } else {
             window.location.href = `/clubs/${club.id}`
         }

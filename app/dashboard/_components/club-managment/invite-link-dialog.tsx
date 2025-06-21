@@ -16,10 +16,11 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {Badge} from "@/components/ui/badge"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Copy, Link, Mail, Users, Clock, Shield, Check, RefreshCw, Calendar} from "lucide-react"
+import {generateUniqueInviteCode} from "@/app/onboarding/_actions/create-club";
 
 interface InviteLinkDialogProps {
     open: boolean
-    onOpenChange: (open: boolean) => void
+    onOpenChangeAction: (open: boolean) => void
     clubName: string
     clubId: string
     inviteCode: string
@@ -28,7 +29,7 @@ interface InviteLinkDialogProps {
 
 export function InviteLinkDialog({
                                      open,
-                                     onOpenChange,
+                                     onOpenChangeAction,
                                      clubName,
                                      clubId,
                                      webUrl,
@@ -71,8 +72,8 @@ export function InviteLinkDialog({
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1000))
 
-        const inviteCode = `${email.split("@")[0].toUpperCase()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`
-        const inviteUrl = `https://athlobase.com/invite/${clubId}/${inviteCode.toLowerCase()}`
+        const inviteCode = await generateUniqueInviteCode()
+        const inviteUrl = `${webUrl}/invite/${clubId}/${inviteCode.toLowerCase()}`
 
         setPersonalInvite({
             url: inviteUrl,
@@ -96,7 +97,7 @@ export function InviteLinkDialog({
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={onOpenChangeAction}>
             <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
@@ -285,7 +286,7 @@ export function InviteLinkDialog({
                 </Tabs>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" onClick={() => onOpenChangeAction(false)}>
                         Done
                     </Button>
                 </DialogFooter>

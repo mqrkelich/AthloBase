@@ -40,7 +40,12 @@ export async function DashboardHeader({currentRole}: DashboardHeaderProps) {
         role: currentRole,
     })) : [];
 
-    const selectedClub = clubs.length > 0 ? clubs[0] : {id: "default", name: "Select a club", role: currentRole};
+    const userSelectedClub = user.selectedClubId;
+
+    const selectedClub =
+        clubs.find(club => club.id === userSelectedClub) ||
+        clubs[0] ||
+        {id: "default", name: "Select a club", role: currentRole};
 
     return (
         <header

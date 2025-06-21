@@ -47,6 +47,8 @@ model User {
   createdAt     DateTime  @default(now())
   dashboardView String? @default("member")
 
+  selectedClubId String? @db.ObjectId
+
   accounts    Account[]
   clubMembers ClubMembers[]
 }
