@@ -19,9 +19,14 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {getClubById} from "@/app/dashboard/_actions/get-club";
 import {formatDate} from "@/lib/utils"
 import {getEventsByClub} from "@/app/dashboard/clubs/_actions/events";
+import {getCurrentUser} from "@/lib/helper/session";
+import {getUserById} from "@/data/user";
 
 export default async function ClubDetailPage({params}: { params: { clubId: string } }) {
     const club = await getClubById(params.clubId);
+
+    const session = await getCurrentUser();
+    const user = await getUserById(session?.id!);
 
 
     if (!club || club.privacy !== "Public") {
@@ -40,6 +45,12 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
     const hasPricingPlanName = (["weekly", "monthly", "yearly"] as Interval[]).some(
         (interval: Interval) => club.pricing?.[interval]?.name?.trim()
     );
+
+    let isMember = false;
+
+    if (user) {
+        isMember = club.members.some(member => member?.id === user.id);
+    }
 
     return (
         <div className="p-6 space-y-8">
@@ -318,9 +329,20 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                         <CardHeader>
                             <CardTitle>Join This Club</CardTitle>
                             <CardDescription className="text-white/60">
-                                Become a member and start participating in activities
+                                {isMember ? "You are a member of this club. You can leave at any time." : "Become a member and start participating in activities."}
                             </CardDescription>
                         </CardHeader>
+                        <CardContent>
+                            {isMember ? (
+                                <Button variant="destructive" className="w-full mt-2">
+                                    Leave Club
+                                </Button>
+                            ) : (
+                                <Button variant="default" className="w-full mt-2">
+                                    Join Club
+                                </Button>
+                            )}
+                        </CardContent>
                     </Card>
 
                     {/* Club Owner */}

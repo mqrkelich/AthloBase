@@ -15,5 +15,7 @@ next steps:
 finish members on the dashboard/clubs
 add pricing on the discover club page
 finish add member button on the dashboard clubs
+add button to join club on the clubs dicover page
+
 
 time for this: 4 hours
