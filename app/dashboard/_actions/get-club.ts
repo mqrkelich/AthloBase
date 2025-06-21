@@ -102,6 +102,7 @@ export const getClub = async (id: string, userId: string) => {
             foundedDate: club.foundedDate || null,
             location: club.location ?? "",
             website: club.website ?? "",
+            inviteCode: club.inviteCode ?? null,
             customStats,
             pricing,
         };
@@ -216,6 +217,25 @@ export const getClubById = async (id: string) => {
         pricing,
     };
 
+}
+
+export const getClubInviteCode = async (clubId: string) => {
+    const session = await getCurrentUser();
+    if (!session) return null;
+
+    const user = await getUserById(session.id!);
+    if (!user) return null;
+
+    const club = await db.club.findUnique({
+        where: {id: clubId, clubOwnerId: user.id},
+        select: {
+            inviteCode: true,
+        },
+    });
+
+    if (!club) return null;
+
+    return club.inviteCode;
 }
 
 export const getClubByInviteCode = async (inviteCode: string) => {

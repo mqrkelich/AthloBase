@@ -11,6 +11,7 @@ import {DashboardMemberPerformance} from "@/app/dashboard/(overview)/_components
 import {DashboardActivityFeed} from "@/app/dashboard/(overview)/_components/dashboard-activity-feed";
 import {DashboardQuickActions} from "@/app/dashboard/(overview)/_components/dashboard-quick-actions";
 import {DashboardMembersList} from "@/app/dashboard/(overview)/_components/dashboard-members-list";
+import InviteLink from "@/app/dashboard/(overview)/invite-link";
 
 
 export default async function DashboardPage() {
@@ -29,6 +30,7 @@ export default async function DashboardPage() {
         ? user.dashboardView
         : "member";
 
+
     return (
         <div className="p-6 space-y-8">
             {/* Page Header */}
@@ -42,6 +44,7 @@ export default async function DashboardPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
+
                     {userRole === "owner" ? (
                         <>
                             <Button variant="outline" className="border-white/10 hover:bg-white/5" asChild>
@@ -50,12 +53,8 @@ export default async function DashboardPage() {
                                     New Event
                                 </Link>
                             </Button>
-                            <Button asChild>
-                                <Link href="/dashboard/clubs/city-runners/members/invite">
-                                    <Plus className="mr-2 h-4 w-4"/>
-                                    Invite Members
-                                </Link>
-                            </Button>
+
+                            <InviteLink/>
                         </>
                     ) : (
                         <>
@@ -98,6 +97,7 @@ export default async function DashboardPage() {
                     <DashboardMembersList/>
                 </div>
             </div>
+
         </div>
     )
 }

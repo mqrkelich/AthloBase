@@ -58,6 +58,7 @@ export interface Club {
     website: string;
     customStats: CustomStat[];
     pricing: Pricing;
+    inviteCode: string | null;
 }
 
 interface ClubManagementClientProps {
@@ -68,6 +69,7 @@ interface ClubManagementClientProps {
 export default function ClubManagementClient({club, clubId}: ClubManagementClientProps) {
 
     const [activeTab, setActiveTab] = useState("overview")
+
 
     return (
         <div className="p-6 space-y-6">
@@ -200,7 +202,7 @@ export default function ClubManagementClient({club, clubId}: ClubManagementClien
                     </TabsContent>
 
                     <TabsContent value="members" className="space-y-6">
-                        <MemberManagement clubId={clubId}/>
+                        <MemberManagement club={club} clubId={clubId}/>
                     </TabsContent>
 
                     <TabsContent value="events" className="space-y-6">

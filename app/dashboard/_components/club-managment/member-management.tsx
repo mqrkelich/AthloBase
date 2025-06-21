@@ -20,6 +20,7 @@ import {
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Checkbox} from "@/components/ui/checkbox"
 import {getPaginatedMembers} from "../../_actions/get-members"
+import {InviteLinkDialog} from "@/app/dashboard/_components/club-managment/invite-link-dialog";
 
 interface Member {
     id: string
@@ -36,9 +37,14 @@ interface Member {
 
 interface MemberManagementProps {
     clubId: string
+    club: {
+        name: string
+        id: string
+        inviteCode: string | null
+    }
 }
 
-export function MemberManagement({clubId}: MemberManagementProps) {
+export function MemberManagement({clubId, club}: MemberManagementProps) {
     const [members, setMembers] = useState<Member[]>([])
     const [searchTerm, setSearchTerm] = useState("")
     const [roleFilter, setRoleFilter] = useState("all")
@@ -115,6 +121,10 @@ export function MemberManagement({clubId}: MemberManagementProps) {
         return status === "Active" ? "bg-emerald-500/20 text-emerald-500" : "bg-orange-500/20 text-orange-500"
     }
 
+    const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
+
+
+
     if (loading) {
         return (
             <Card className="bg-zinc-900/50 border-white/10 text-white">
@@ -136,10 +146,11 @@ export function MemberManagement({clubId}: MemberManagementProps) {
                             Manage your club members, roles, and permissions
                         </CardDescription>
                     </div>
-                    <Button>
+                    <Button onClick={() => setInviteDialogOpen(true)}>
                         <UserPlus className="mr-2 h-4 w-4"/>
                         Add Member
                     </Button>
+
                 </CardHeader>
             </Card>
 
@@ -334,6 +345,16 @@ export function MemberManagement({clubId}: MemberManagementProps) {
                     </CardContent>
                 </Card>
             )}
+
+            <InviteLinkDialog
+                open={inviteDialogOpen}
+                onOpenChange={setInviteDialogOpen}
+                clubName={club.name}
+                clubId={club.id}
+                inviteCode={club.inviteCode || "default-invite-code"}
+                webUrl={process.env.WEB_URL || "http://localhost:3000"}
+            />
+
         </div>
     )
 }

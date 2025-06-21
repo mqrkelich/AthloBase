@@ -28,7 +28,6 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
     const session = await getCurrentUser();
     const user = await getUserById(session?.id!);
 
-
     if (!club || club.privacy !== "Public") {
         return (
             <div className="p-6">
