@@ -39,14 +39,8 @@ export function ClubSelector({currentRole, selectedClub, clubs}: ClubSelectorPro
     }
 
     const selectClub = async (club: Club) => {
-        if (currentRole === "owner") {
-            await setSelectClub(club.id);
-            window.location.reload();
-            // refresh the page to reflect the change
-
-        } else {
-            window.location.href = `/clubs/${club.id}`
-        }
+        await setSelectClub(club.id);
+        window.location.reload();
     }
 
     return (

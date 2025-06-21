@@ -38,7 +38,6 @@ export const setSelectClub = async (clubId: string) => {
     if (!club) return null;
 
     // Change the query based on the role
-
     await db.user.update({
         where: {id: user.id},
         data: {
