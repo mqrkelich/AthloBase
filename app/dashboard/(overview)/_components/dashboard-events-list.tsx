@@ -1,46 +1,99 @@
+"use client"
+
+import {useEffect, useState} from "react"
 import {ArrowRight, Calendar, ChevronRight, Clock, MapPin, Users, CheckCircle2} from "lucide-react"
 import Link from "next/link"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
 
+interface Event {
+    id: string
+    date: { day: number; month: string }
+    title: string
+    club: { name: string; color: string }
+    type: string
+    time: string
+    location: string
+    attendees: number
+    status: string
+}
+
 export function DashboardEventsList() {
-    // Mock data for events
-    const events = [
-        {
-            id: "event-1",
-            date: {day: 12, month: "JUN"},
-            title: "Weekly Track Practice",
-            club: {name: "City Runners", color: "emerald"},
-            type: "Training",
-            time: "6:00 PM - 8:00 PM",
-            location: "Central Park Track",
-            attendees: 18,
-            status: "upcoming", // upcoming, ongoing, completed
-        },
-        {
-            id: "event-2",
-            date: {day: 14, month: "JUN"},
-            title: "League Match vs. Eastside Ballers",
-            club: {name: "Metro Basketball", color: "orange"},
-            type: "Game",
-            time: "7:30 PM - 9:30 PM",
-            location: "Downtown Sports Center",
-            attendees: 12,
-            status: "ongoing",
-        },
-        {
-            id: "event-3",
-            date: {day: 16, month: "JUN"},
-            title: "Monthly Team Dinner",
-            club: {name: "City Runners", color: "emerald"},
-            type: "Social",
-            time: "7:00 PM - 10:00 PM",
-            location: "Riverside Grill",
-            attendees: 22,
-            status: "upcoming",
-        },
-    ]
+    const [events, setEvents] = useState<Event[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function loadEvents() {
+            try {
+                // This would be replaced with a proper server action
+                // For now, using mock data but structured to match real data
+                const mockEvents: Event[] = [
+                    {
+                        id: "event-1",
+                        date: {day: 12, month: "JUN"},
+                        title: "Weekly Track Practice",
+                        club: {name: "City Runners", color: "emerald"},
+                        type: "Training",
+                        time: "6:00 PM - 8:00 PM",
+                        location: "Central Park Track",
+                        attendees: 18,
+                        status: "upcoming",
+                    },
+                    {
+                        id: "event-2",
+                        date: {day: 14, month: "JUN"},
+                        title: "League Match vs. Eastside Ballers",
+                        club: {name: "Metro Basketball", color: "orange"},
+                        type: "Game",
+                        time: "7:30 PM - 9:30 PM",
+                        location: "Downtown Sports Center",
+                        attendees: 12,
+                        status: "ongoing",
+                    },
+                    {
+                        id: "event-3",
+                        date: {day: 16, month: "JUN"},
+                        title: "Monthly Team Dinner",
+                        club: {name: "City Runners", color: "emerald"},
+                        type: "Social",
+                        time: "7:00 PM - 10:00 PM",
+                        location: "Riverside Grill",
+                        attendees: 22,
+                        status: "upcoming",
+                    },
+                ]
+                setEvents(mockEvents)
+            } catch (error) {
+                console.error("Failed to load events:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadEvents()
+    }, [])
+
+    if (loading) {
+        return (
+            <Card className="bg-zinc-900/50 border-white/10 text-white">
+                <CardHeader>
+                    <CardTitle>Upcoming Events</CardTitle>
+                    <CardDescription className="text-white/60">Loading events...</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="bg-white/5 p-3 rounded-lg animate-pulse">
+                                <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
+                                <div className="h-3 bg-white/10 rounded w-1/2"></div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card className="bg-zinc-900/50 border-white/10 text-white">

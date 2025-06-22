@@ -1,17 +1,17 @@
 "use server"
 
-import {db} from "@/lib/db";
-import {Activity, Target, Users, Trophy} from "lucide-react";
-import {getCurrentUser} from "@/lib/helper/session";
-import {getUserById} from "@/data/user";
+import {db} from "@/lib/db"
+import {Activity, Target, Users, Trophy} from "lucide-react"
+import {getCurrentUser} from "@/lib/helper/session"
+import {getUserById} from "@/data/user"
 
 export const getClub = async (id: string, userId: string) => {
     try {
         const user = await db.user.findUnique({
-            where: {id: userId}
-        });
+            where: {id: userId},
+        })
 
-        if (!user) return null;
+        if (!user) return null
 
         const club = await db.club.findUnique({
             where: {id: id, clubOwnerId: user.id},
@@ -23,9 +23,9 @@ export const getClub = async (id: string, userId: string) => {
                     },
                 },
             },
-        });
+        })
 
-        if (!club) return null;
+        if (!club) return null
 
         const iconMap = {
             activity: Activity,
@@ -48,17 +48,16 @@ export const getClub = async (id: string, userId: string) => {
             }
         })
 
-
         interface PricingEntry {
-            name: string;
-            price: number;
-            features: string[];
+            name: string
+            price: number
+            features: string[]
         }
 
         interface Pricing {
-            weekly: PricingEntry;
-            monthly: PricingEntry;
-            yearly: PricingEntry;
+            weekly: PricingEntry
+            monthly: PricingEntry
+            yearly: PricingEntry
         }
 
         const pricing: Pricing = {
@@ -77,7 +76,7 @@ export const getClub = async (id: string, userId: string) => {
                 price: 0,
                 features: [],
             },
-        };
+        }
 
         club.pricing.forEach((price) => {
             if (price.interval === "weekly" || price.interval === "monthly" || price.interval === "yearly") {
@@ -85,9 +84,9 @@ export const getClub = async (id: string, userId: string) => {
                     name: price.name,
                     price: price.price,
                     features: price.features.map((f) => f.description),
-                };
+                }
             }
-        });
+        })
 
         return {
             id: club.id,
@@ -105,15 +104,13 @@ export const getClub = async (id: string, userId: string) => {
             inviteCode: club.inviteCode ?? null,
             customStats,
             pricing,
-        };
-
+        }
     } catch {
-        return null;
+        return null
     }
 }
 
-
-type Interval = "weekly" | "monthly" | "yearly";
+type Interval = "weekly" | "monthly" | "yearly"
 
 export const getClubById = async (id: string) => {
     const club = await db.club.findUnique({
@@ -127,9 +124,9 @@ export const getClubById = async (id: string) => {
             },
             clubMembers: true,
         },
-    });
+    })
 
-    if (!club) return null;
+    if (!club) return null
 
     const iconMap = {
         activity: Activity,
@@ -139,57 +136,58 @@ export const getClubById = async (id: string) => {
     }
 
     const customStats = club.customStats.map((stat, index) => {
-        const iconKey = typeof stat.icon === "string" ? stat.icon.toLowerCase() : "";
+        const iconKey = typeof stat.icon === "string" ? stat.icon.toLowerCase() : ""
 
-        const icon = iconMap[iconKey as keyof typeof iconMap] ?? Users;
         return {
-            id: index + 1,
+            id: stat.id, // Use the actual stat.id instead of index + 1
             label: stat.label,
             value: stat.value,
             unit: stat.unit,
-            icon,
-        };
-    });
+            icon: stat.icon || "users", // Return the icon name as string, not the component
+        }
+    })
 
     const pricing: Record<Interval, { name: string; price: number; features: string[] }> = {
         weekly: {name: "", price: 0, features: []},
         monthly: {name: "", price: 0, features: []},
         yearly: {name: "", price: 0, features: []},
-    };
+    }
 
     club.pricing.forEach((price) => {
         if (["weekly", "monthly", "yearly"].includes(price.interval)) {
-            const interval = price.interval as Interval;
+            const interval = price.interval as Interval
             pricing[interval] = {
                 name: price.name,
                 price: price.price,
                 features: price.features.map((f) => f.description),
-            };
+            }
         }
-    });
+    })
 
     const members = await Promise.all(
         club.clubMembers.map(async (member) => {
-            const user = await getUserById(member.userId);
-            if (!user) return null;
+            const user = await getUserById(member.userId)
+            if (!user) return null
             return {
                 id: user.id,
                 name: user.name || "Unknown User",
                 email: user.email,
                 image: user.image,
-                joined: member.createdAt || null
-            };
-        })
-    );
+                joined: member.createdAt || null,
+            }
+        }),
+    )
 
-    const ownerInfo = await getUserById(club.clubOwnerId);
-    const owner = ownerInfo ? {
-        id: ownerInfo.id,
-        name: ownerInfo.name || "Club Owner",
-        email: ownerInfo.email,
-        image: ownerInfo.image,
-        createdAt: ownerInfo.createdAt,
-    } : null;
+    const ownerInfo = await getUserById(club.clubOwnerId)
+    const owner = ownerInfo
+        ? {
+            id: ownerInfo.id,
+            name: ownerInfo.name || "Club Owner",
+            email: ownerInfo.email,
+            image: ownerInfo.image,
+            createdAt: ownerInfo.createdAt,
+        }
+        : null
 
     return {
         id: club.id,
@@ -200,15 +198,14 @@ export const getClubById = async (id: string) => {
         logo: club.logo ?? "/placeholder.svg?height=80&width=80",
         memberCount: club.memberCount ?? 0,
         activeEvents: club.activeEvents ?? 0,
-        privacy: club.privacy
-            .charAt(0)
-            .toUpperCase() + club.privacy.slice(1),
+        privacy: club.privacy.charAt(0).toUpperCase() + club.privacy.slice(1),
         meetingDays: club.meetingDays ?? [],
         meetingTime: club.meetingTime ?? "",
         skillLevel: club.skillLevel ? club.skillLevel.charAt(0).toUpperCase() + club.skillLevel.slice(1) : "Mixed",
         ageGroup: club.ageGroup ? club.ageGroup.charAt(0).toUpperCase() + club.ageGroup.slice(1) : "All Ages",
         totalEvents: club.totalEvents ?? 0,
         foundedDate: club.foundedDate || null,
+        createdAt: club.createdAt,
         location: club.location ?? "",
         website: club.website ?? "",
         members: members.filter(Boolean),
@@ -216,42 +213,85 @@ export const getClubById = async (id: string) => {
         owner,
         customStats,
         pricing,
-    };
-
+    }
 }
 
 export const getClubInviteCode = async (clubId: string) => {
-    const session = await getCurrentUser();
-    if (!session) return null;
+    const session = await getCurrentUser()
+    if (!session) return null
 
-    const user = await getUserById(session.id!);
-    if (!user) return null;
+    const user = await getUserById(session.id!)
+    if (!user) return null
 
     const club = await db.club.findUnique({
         where: {id: clubId, clubOwnerId: user.id},
         select: {
             inviteCode: true,
         },
-    });
+    })
 
-    if (!club) return null;
+    if (!club) return null
 
-    return club.inviteCode;
+    return club.inviteCode
 }
 
 export const getClubByInviteCode = async (inviteCode: string) => {
+    const session = await getCurrentUser()
+    if (!session) return null
 
-    const session = await getCurrentUser();
-    if (!session) return null;
-
-    const user = await getUserById(session.id!);
-    if (!user) return null;
+    const user = await getUserById(session.id!)
+    if (!user) return null
 
     const club = await db.club.findUnique({
-        where: {inviteCode: inviteCode,},
-    });
+        where: {inviteCode: inviteCode},
+    })
 
-    if (!club) return null;
+    if (!club) return null
 
-    return club;
+    return club
+}
+
+export const getMemberClubs = async (userId: string) => {
+    try {
+        const clubs = await db.club.findMany({
+            where: {
+                clubMembers: {
+                    some: {
+                        userId: userId,
+                    },
+                },
+            },
+            include: {
+                clubMembers: {
+                    where: {
+                        userId: userId,
+                    },
+                },
+            },
+        })
+
+        return clubs.map((club) => {
+            const membership = club.clubMembers[0]
+            return {
+                id: club.id,
+                name: club.name,
+                sport: club.sport,
+                description: club.description ?? "",
+                coverImage: club.image ?? "/placeholder.svg?height=200&width=800",
+                logo: club.logo ?? "/placeholder.svg?height=80&width=80",
+                memberCount: club.memberCount ?? 0,
+                activeEvents: club.activeEvents ?? 0,
+                totalEvents: club.totalEvents ?? 0,
+                foundedDate: club.foundedDate || null,
+                location: club.location ?? "",
+                website: club.website ?? "",
+                inviteCode: club.inviteCode ?? null,
+                joinedDate: membership?.createdAt || null,
+                membershipStatus: membership?.status || "active",
+            }
+        })
+    } catch (error) {
+        console.error("Error fetching member clubs:", error)
+        return []
+    }
 }

@@ -1,49 +1,102 @@
+"use client"
+
+import {useEffect, useState} from "react"
 import {ArrowRight, Calendar, ChevronRight, Clock, MapPin, Users, CheckCircle2} from "lucide-react"
 import Link from "next/link"
 import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
 
+interface Event {
+    id: string
+    date: { day: number; month: string }
+    title: string
+    club: { name: string; color: string }
+    type: string
+    time: string
+    location: string
+    attendees: number
+    status: string
+    myStatus: string
+}
+
 export function DashboardMemberEvents() {
-    // Mock data for member's events
-    const events = [
-        {
-            id: "event-1",
-            date: {day: 12, month: "JUN"},
-            title: "Weekly Track Practice",
-            club: {name: "City Runners", color: "emerald"},
-            type: "Training",
-            time: "6:00 PM - 8:00 PM",
-            location: "Central Park Track",
-            attendees: 18,
-            status: "upcoming",
-            myStatus: "registered", // registered, attended, missed
-        },
-        {
-            id: "event-2",
-            date: {day: 14, month: "JUN"},
-            title: "League Match vs. Eastside Ballers",
-            club: {name: "Metro Basketball", color: "orange"},
-            type: "Game",
-            time: "7:30 PM - 9:30 PM",
-            location: "Downtown Sports Center",
-            attendees: 12,
-            status: "ongoing",
-            myStatus: "registered",
-        },
-        {
-            id: "event-3",
-            date: {day: 10, month: "JUN"},
-            title: "Morning Run Session",
-            club: {name: "City Runners", color: "emerald"},
-            type: "Training",
-            time: "7:00 AM - 8:30 AM",
-            location: "Riverside Park",
-            attendees: 15,
-            status: "completed",
-            myStatus: "attended",
-        },
-    ]
+    const [events, setEvents] = useState<Event[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        async function loadMemberEvents() {
+            try {
+                // This would be replaced with a proper server action to get user's events
+                const mockEvents: Event[] = [
+                    {
+                        id: "event-1",
+                        date: {day: 12, month: "JUN"},
+                        title: "Weekly Track Practice",
+                        club: {name: "City Runners", color: "emerald"},
+                        type: "Training",
+                        time: "6:00 PM - 8:00 PM",
+                        location: "Central Park Track",
+                        attendees: 18,
+                        status: "upcoming",
+                        myStatus: "registered",
+                    },
+                    {
+                        id: "event-2",
+                        date: {day: 14, month: "JUN"},
+                        title: "League Match vs. Eastside Ballers",
+                        club: {name: "Metro Basketball", color: "orange"},
+                        type: "Game",
+                        time: "7:30 PM - 9:30 PM",
+                        location: "Downtown Sports Center",
+                        attendees: 12,
+                        status: "ongoing",
+                        myStatus: "registered",
+                    },
+                    {
+                        id: "event-3",
+                        date: {day: 10, month: "JUN"},
+                        title: "Morning Run Session",
+                        club: {name: "City Runners", color: "emerald"},
+                        type: "Training",
+                        time: "7:00 AM - 8:30 AM",
+                        location: "Riverside Park",
+                        attendees: 15,
+                        status: "completed",
+                        myStatus: "attended",
+                    },
+                ]
+                setEvents(mockEvents)
+            } catch (error) {
+                console.error("Failed to load member events:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadMemberEvents()
+    }, [])
+
+    if (loading) {
+        return (
+            <Card className="bg-zinc-900/50 border-white/10 text-white">
+                <CardHeader>
+                    <CardTitle>My Events</CardTitle>
+                    <CardDescription className="text-white/60">Loading your events...</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="bg-white/5 p-3 rounded-lg animate-pulse">
+                                <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
+                                <div className="h-3 bg-white/10 rounded w-1/2"></div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card className="bg-zinc-900/50 border-white/10 text-white">

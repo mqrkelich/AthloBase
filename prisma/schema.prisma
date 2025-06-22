@@ -49,8 +49,10 @@ model User {
 
   selectedClubId String? @db.ObjectId
 
-  accounts    Account[]
-  clubMembers ClubMembers[]
+  accounts           Account[]
+  clubMembers        ClubMembers[]
+  eventRegistrations EventRegistration[]
+  eventAttendances   EventAttendance[]
 }
 
 model Club {
@@ -155,7 +157,43 @@ model Event {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  club Club @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  club          Club                @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  registrations EventRegistration[]
+  attendances   EventAttendance[]
 
   @@index([clubId])
+  @@index([date])
+}
+
+model EventRegistration {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId   String   @db.ObjectId
+  userId    String   @db.ObjectId
+  status    String   @default("registered") // registered, cancelled, waitlist
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+}
+
+model EventAttendance {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  eventId     String   @db.ObjectId
+  userId      String   @db.ObjectId
+  status      String   @default("present") // present, absent, late
+  checkedInAt DateTime @default(now())
+  checkedInBy String?  @db.ObjectId // who marked the attendance
+  notes       String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
 }

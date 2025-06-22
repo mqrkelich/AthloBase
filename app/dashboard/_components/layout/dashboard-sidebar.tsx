@@ -15,8 +15,8 @@ import {notFound} from "next/navigation";
 import {getUserClubs} from "@/app/dashboard/_actions/user-data";
 import {UserProfileMenu} from "./user-profile-menu"
 import {NavigationMenu} from "@/app/dashboard/_components/layout/navigation-menu";
-import {ClubsNavigation} from "@/app/dashboard/_components/layout/clubs-navigation";
 import {SettingsNavigation} from "@/app/dashboard/_components/layout/settings-navigation";
+import {ClubsNavigation} from "@/app/dashboard/_components/layout/clubs-navigation";
 
 interface DashboardSidebarProps {
     currentRole: "owner" | "member"
@@ -37,7 +37,7 @@ export async function DashboardSidebar({currentRole, userRoles}: DashboardSideba
     const mappedClubs = userClubs ? userClubs.map(club => ({
         id: club.id,
         name: club.name,
-        href: `/dashboard/clubs/${club.id}`,
+        href: `/dashboard/clubs/${club.id}${currentRole === "member" ? "/member" : ""}`,
         logo: club.logo || undefined,
         role: currentRole,
     })) : [];
