@@ -16,9 +16,10 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 
 interface DashboardQuickActionsProps {
     userRole?: "owner" | "member"
+    clubId?: string // Add clubId prop
 }
 
-export function DashboardQuickActions({userRole = "member"}: DashboardQuickActionsProps) {
+export function DashboardQuickActions({userRole = "member", clubId}: DashboardQuickActionsProps) {
     const ownerActions = [
         {
             icon: Plus,
@@ -28,7 +29,7 @@ export function DashboardQuickActions({userRole = "member"}: DashboardQuickActio
         {
             icon: Users,
             label: "Invite Members",
-            href: "/dashboard/clubs/city-runners/members/invite",
+            href: `/dashboard/clubs/${clubId || "default"}/members/invite`,
         },
         {
             icon: Calendar,
@@ -38,12 +39,12 @@ export function DashboardQuickActions({userRole = "member"}: DashboardQuickActio
         {
             icon: ArrowUpRight,
             label: "Share Club Page",
-            href: "/dashboard/clubs/city-runners/share",
+            href: `/dashboard/clubs/${clubId || "default"}/share`,
         },
         {
             icon: BarChart3,
             label: "Member Data",
-            href: "/dashboard/city-runners/member-data",
+            href: `/dashboard/${clubId || "default"}/member-data`,
         },
         {
             icon: Ticket,

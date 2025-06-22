@@ -1,69 +1,40 @@
 "use client"
 
 import {useEffect, useState} from "react"
-import {ArrowRight, Calendar, ChevronRight, Clock, MapPin, Users, CheckCircle2} from "lucide-react"
+import {Calendar, MapPin, Users, Clock} from "lucide-react"
 import Link from "next/link"
 import {Button} from "@/components/ui/button"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
+import {getOwnerEvents} from "@/app/dashboard/(overview)/_actions/dashboard-data"
+
+interface DashboardEventsListProps {
+    clubId?: string
+}
 
 interface Event {
     id: string
-    date: { day: number; month: string }
     title: string
-    club: { name: string; color: string }
-    type: string
+    description: string | null
+    date: Date
     time: string
-    location: string
-    attendees: number
-    status: string
+    location: string | null
+    registrationCount: number
+    attendanceCount: number
+    capacity: number | null
 }
 
-export function DashboardEventsList() {
+export function DashboardEventsList({clubId}: DashboardEventsListProps) {
     const [events, setEvents] = useState<Event[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function loadEvents() {
             try {
-                // This would be replaced with a proper server action
-                // For now, using mock data but structured to match real data
-                const mockEvents: Event[] = [
-                    {
-                        id: "event-1",
-                        date: {day: 12, month: "JUN"},
-                        title: "Weekly Track Practice",
-                        club: {name: "City Runners", color: "emerald"},
-                        type: "Training",
-                        time: "6:00 PM - 8:00 PM",
-                        location: "Central Park Track",
-                        attendees: 18,
-                        status: "upcoming",
-                    },
-                    {
-                        id: "event-2",
-                        date: {day: 14, month: "JUN"},
-                        title: "League Match vs. Eastside Ballers",
-                        club: {name: "Metro Basketball", color: "orange"},
-                        type: "Game",
-                        time: "7:30 PM - 9:30 PM",
-                        location: "Downtown Sports Center",
-                        attendees: 12,
-                        status: "ongoing",
-                    },
-                    {
-                        id: "event-3",
-                        date: {day: 16, month: "JUN"},
-                        title: "Monthly Team Dinner",
-                        club: {name: "City Runners", color: "emerald"},
-                        type: "Social",
-                        time: "7:00 PM - 10:00 PM",
-                        location: "Riverside Grill",
-                        attendees: 22,
-                        status: "upcoming",
-                    },
-                ]
-                setEvents(mockEvents)
+                if (clubId && clubId !== "default") {
+                    const data = await getOwnerEvents(clubId, 5)
+                    setEvents(data || []) // Handle null case
+                }
             } catch (error) {
                 console.error("Failed to load events:", error)
             } finally {
@@ -72,7 +43,7 @@ export function DashboardEventsList() {
         }
 
         loadEvents()
-    }, [])
+    }, [clubId])
 
     if (loading) {
         return (
@@ -84,7 +55,7 @@ export function DashboardEventsList() {
                 <CardContent>
                     <div className="space-y-4">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="bg-white/5 p-3 rounded-lg animate-pulse">
+                            <div key={i} className="p-3 bg-white/5 rounded-lg animate-pulse">
                                 <div className="h-4 bg-white/10 rounded w-3/4 mb-2"></div>
                                 <div className="h-3 bg-white/10 rounded w-1/2"></div>
                             </div>
@@ -95,98 +66,80 @@ export function DashboardEventsList() {
         )
     }
 
+    if (events.length === 0) {
+        return (
+            <Card className="bg-zinc-900/50 border-white/10 text-white">
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>Upcoming Events</CardTitle>
+                        <CardDescription className="text-white/60">No upcoming events</CardDescription>
+                    </div>
+                    <Button size="sm" asChild>
+                        <Link href={`/dashboard/clubs/${clubId}?tab=events`}>Create Event</Link>
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-white/60">Create your first event to get started!</p>
+                </CardContent>
+            </Card>
+        )
+    }
+
     return (
         <Card className="bg-zinc-900/50 border-white/10 text-white">
             <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                     <CardTitle>Upcoming Events</CardTitle>
-                    <CardDescription className="text-white/60">Your scheduled events for the next 7
-                        days</CardDescription>
+                    <CardDescription className="text-white/60">Your scheduled events</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" className="gap-1" asChild>
-                    <Link href="/dashboard/events">
-                        View All <ArrowRight className="h-4 w-4"/>
-                    </Link>
+                <Button variant="ghost" size="sm" asChild>
+                    <Link href={`/dashboard/clubs/${clubId}?tab=events`}>View All</Link>
                 </Button>
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
                     {events.map((event) => (
-                        <div
-                            key={event.id}
-                            className="flex items-start gap-4 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                        >
-                            <div
-                                className={`flex flex-col items-center justify-center bg-${event.club.color}-500/20 text-${event.club.color}-500 h-14 w-14 rounded-lg`}
-                            >
-                                <span className="text-lg font-bold">{event.date.day}</span>
-                                <span className="text-xs">{event.date.month}</span>
+                        <div key={event.id} className="p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                            <div className="flex items-start justify-between mb-2">
+                                <h4 className="font-medium">{event.title}</h4>
+                                <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-0">
+                                    {event.registrationCount} registered
+                                </Badge>
                             </div>
-                            <div className="flex-1 min-w-0">
+
+                            <div className="space-y-1 text-sm text-white/60">
                                 <div className="flex items-center gap-2">
-                                    <Badge
-                                        variant="outline"
-                                        className={`bg-${event.club.color}-500/20 text-${event.club.color}-500 border-0`}
-                                    >
-                                        {event.club.name}
-                                    </Badge>
-                                    <Badge variant="outline" className="bg-white/10 text-white/80 border-0">
-                                        {event.type}
-                                    </Badge>
-                                    {event.status === "ongoing" && (
-                                        <Badge variant="outline"
-                                               className="bg-green-500/20 text-green-500 border-0 animate-pulse">
-                                            Ongoing Now
-                                        </Badge>
-                                    )}
+                                    <Calendar className="h-4 w-4"/>
+                                    <span>
+                    {event.date.toLocaleDateString()} at {event.time}
+                  </span>
                                 </div>
-                                <h4 className="font-medium mt-1">{event.title}</h4>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-sm text-white/60">
-                                    <div className="flex items-center">
-                                        <Clock className="mr-1 h-3.5 w-3.5"/>
-                                        <span>{event.time}</span>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <MapPin className="mr-1 h-3.5 w-3.5"/>
+
+                                {event.location && (
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="h-4 w-4"/>
                                         <span>{event.location}</span>
                                     </div>
-                                    <div className="flex items-center">
-                                        <Users className="mr-1 h-3.5 w-3.5"/>
-                                        <span>{event.attendees} attending</span>
+                                )}
+
+                                <div className="flex items-center gap-4 mt-2">
+                                    <div className="flex items-center gap-1">
+                                        <Users className="h-4 w-4"/>
+                                        <span>{event.registrationCount} registered</span>
                                     </div>
+
+                                    {event.capacity && (
+                                        <div className="flex items-center gap-1">
+                                            <Clock className="h-4 w-4"/>
+                                            <span>{event.capacity - event.registrationCount} spots left</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            {event.status === "ongoing" ? (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="shrink-0 border-green-500/30 bg-green-500/10 text-green-500 hover:bg-green-500/20"
-                                    asChild
-                                >
-                                    <Link href={`/dashboard/events/${event.id}/attendance`}>
-                                        <CheckCircle2 className="mr-1 h-4 w-4"/>
-                                        Mark Attendance
-                                    </Link>
-                                </Button>
-                            ) : (
-                                <Button variant="ghost" size="icon" className="rounded-full" asChild>
-                                    <Link href={`/dashboard/events/${event.id}`}>
-                                        <ChevronRight className="h-5 w-5"/>
-                                    </Link>
-                                </Button>
-                            )}
                         </div>
                     ))}
                 </div>
             </CardContent>
-            <CardFooter className="border-t border-white/10 pt-4">
-                <Button variant="outline" className="w-full border-white/10 hover:bg-white/5" asChild>
-                    <Link href="/dashboard/events">
-                        <Calendar className="mr-2 h-4 w-4"/>
-                        View Full Calendar
-                    </Link>
-                </Button>
-            </CardFooter>
         </Card>
     )
 }
