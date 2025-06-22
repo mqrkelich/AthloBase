@@ -66,3 +66,52 @@ export const joinClubWithInvite = async (inviteCode: string) => {
 
 
 }
+
+export const leaveClub = async (clubId: string) => {
+    const session = await getCurrentUser();
+    if (!session) return {error: "Unauthorized!"};
+
+    const user = await getUserById(session.id!);
+    if (!user) return {error: "User not found."};
+
+    const club = await db.club.findUnique({
+        where: {
+            id: clubId,
+        }
+    });
+
+    if (!club) return {error: "Club not found."}
+
+    // Check if the user is a member of the club
+    const isMember = await db.clubMembers.findFirst({
+        where: {
+            clubId: club.id,
+            userId: user.id,
+        }
+    });
+
+    // check if the user is the owner of the club
+    const isOwner = club.clubOwnerId === user.id;
+    if (isOwner) return {error: "You cannot leave a club you own. You can only remove it."}
+
+    if (!isMember) return {error: "You are not a member of this club."}
+
+    // Remove the user from the club members
+    await db.clubMembers.delete({
+        where: {
+            id: isMember.id,
+        }
+    });
+
+    // Decrement the member count of the club
+    await db.club.update({
+        where: {
+            id: club.id,
+        },
+        data: {
+            memberCount: (club.memberCount || 0) - 1,
+        }
+    });
+
+    return {success: "Successfully left the club."}
+}

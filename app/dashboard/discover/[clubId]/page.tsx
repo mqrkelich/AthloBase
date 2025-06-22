@@ -21,6 +21,7 @@ import {formatDate} from "@/lib/utils"
 import {getEventsByClub} from "@/app/dashboard/clubs/_actions/events";
 import {getCurrentUser} from "@/lib/helper/session";
 import {getUserById} from "@/data/user";
+import JoinLeaveButtons from "@/app/dashboard/discover/_components/join-leave-buttons";
 
 export default async function ClubDetailPage({params}: { params: { clubId: string } }) {
     const club = await getClubById(params.clubId);
@@ -332,15 +333,9 @@ export default async function ClubDetailPage({params}: { params: { clubId: strin
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {isMember ? (
-                                <Button variant="destructive" className="w-full mt-2">
-                                    Leave Club
-                                </Button>
-                            ) : (
-                                <Button variant="default" className="w-full mt-2">
-                                    Join Club
-                                </Button>
-                            )}
+
+                            <JoinLeaveButtons clubId={club.id} inviteCode={club.inviteCode} isMember={isMember}/>
+
                         </CardContent>
                     </Card>
 

@@ -212,6 +212,7 @@ export const getClubById = async (id: string) => {
         location: club.location ?? "",
         website: club.website ?? "",
         members: members.filter(Boolean),
+        inviteCode: club.inviteCode ?? null,
         owner,
         customStats,
         pricing,

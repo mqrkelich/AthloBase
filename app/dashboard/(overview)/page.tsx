@@ -8,7 +8,6 @@ import {notFound, redirect} from "next/navigation";
 import {DashboardMemberMetrics} from "@/app/dashboard/(overview)/_components/dashboard-member-metrics";
 import {DashboardMemberEvents} from "@/app/dashboard/(overview)/_components/dashboard-member-events";
 import {DashboardMemberPerformance} from "@/app/dashboard/(overview)/_components/dashboard-member-performance";
-import {DashboardActivityFeed} from "@/app/dashboard/(overview)/_components/dashboard-activity-feed";
 import {DashboardQuickActions} from "@/app/dashboard/(overview)/_components/dashboard-quick-actions";
 import {DashboardMembersList} from "@/app/dashboard/(overview)/_components/dashboard-members-list";
 import InviteLink from "@/app/dashboard/(overview)/invite-link";
@@ -101,8 +100,6 @@ export default async function DashboardPage() {
 
                 {/* Sidebar Content */}
                 <div className="space-y-6">
-                    {/* Recent Activity */}
-                    <DashboardActivityFeed/>
 
                     {/* Quick Actions */}
                     <DashboardQuickActions userRole={userRole}/>
