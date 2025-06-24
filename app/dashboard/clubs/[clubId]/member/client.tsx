@@ -335,7 +335,7 @@ export default function ClubMemberClient({club, clubId, currentUser, events: ini
                                                         onClick={() => handleRSVP(event.id, event.isRegistered || false)}
                                                         disabled={loading === event.id}
                                                     >
-                                                        {loading === event.id ? "..." : event.isRegistered ? "Cancel" : "RSVP"}
+                                                        {loading === event.id ? "..." : event.isRegistered ? "Cancel" : "Join"}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -456,7 +456,7 @@ export default function ClubMemberClient({club, clubId, currentUser, events: ini
                                                         onClick={() => handleRSVP(event.id, event.isRegistered || false)}
                                                         disabled={loading === event.id}
                                                     >
-                                                        {loading === event.id ? "..." : event.isRegistered ? "Cancel" : "RSVP"}
+                                                        {loading === event.id ? "..." : event.isRegistered ? "Cancel" : "Join"}
                                                     </Button>
                                                     <Button size="sm" variant="outline"
                                                             className="border-white/10 hover:bg-white/5">
