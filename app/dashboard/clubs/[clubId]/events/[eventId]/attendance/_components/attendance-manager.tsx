@@ -37,6 +37,7 @@ interface AttendanceManagerProps {
     eventId: string
     registrations: Registration[]
     attendances: Attendance[]
+    userId: string
 }
 
 const getInitials = (name: string) => {
@@ -47,7 +48,12 @@ const getInitials = (name: string) => {
         .toUpperCase()
 }
 
-export function AttendanceManager({eventId, registrations, attendances: initialAttendances}: AttendanceManagerProps) {
+export function AttendanceManager({
+                                      eventId,
+                                      registrations,
+                                      attendances: initialAttendances,
+                                      userId
+                                  }: AttendanceManagerProps) {
     const [attendances, setAttendances] = useState(initialAttendances)
     const [isPending, startTransition] = useTransition()
 
@@ -253,20 +259,14 @@ export function AttendanceManager({eventId, registrations, attendances: initialA
                         <Button
                             variant="outline"
                             onClick={() => {
-                                // Example: Mark attendance for a test user "Matias Markelic"
-                                const testUser = registrations.find(
-                                    (reg) =>
-                                        reg.user.name?.toLowerCase().includes("matias") || reg.user.email?.toLowerCase().includes("matias"),
-                                )
-                                if (testUser) {
-                                    handleMarkAttendance(testUser.userId, "present")
-                                } else {
-                                    toast.error("Test user 'Matias' not found in registrations")
-                                }
+
+
+                                handleMarkAttendance(userId, "present")
+
                             }}
                             disabled={isPending}
                         >
-                            Mark Matias Present
+                            Mark Present
                         </Button>
                         <Button
                             variant="outline"

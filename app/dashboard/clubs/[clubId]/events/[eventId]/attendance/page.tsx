@@ -4,6 +4,8 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Badge} from "@/components/ui/badge"
 import {CalendarDays, Clock, MapPin, Users} from "lucide-react"
 import {notFound} from "next/navigation"
+import {getCurrentUser} from "@/lib/helper/session";
+import {getUserById} from "@/data/user";
 
 interface AttendancePageProps {
     params: {
@@ -18,6 +20,11 @@ export default async function AttendancePage({params}: AttendancePageProps) {
     if (!event || !event.canMarkAttendance) {
         notFound()
     }
+
+    const session = await getCurrentUser();
+    const user = await getUserById(session?.id!);
+
+    if (!user) return notFound();
 
     return (
         <div className="container mx-auto p-6 space-y-6">
@@ -54,7 +61,7 @@ export default async function AttendancePage({params}: AttendancePageProps) {
                 </CardContent>
             </Card>
 
-            <AttendanceManager eventId={params.eventId} registrations={event.registrations}
+            <AttendanceManager userId={user.id} eventId={params.eventId} registrations={event.registrations}
                                attendances={event.attendances}/>
         </div>
     )
