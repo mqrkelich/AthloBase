@@ -195,14 +195,17 @@ export async function getMemberDashboardMetrics(userId: string) {
     const attendanceRate = registrations.length > 0 ? Math.round((attendances.length / registrations.length) * 100) : 0
 
     // Get member since date
-    const oldestMembership = memberships.reduce((oldest, current) =>
-        current.createdAt < oldest.createdAt ? current : oldest,
-    )
+    const oldestMembership =
+        memberships.length > 0
+            ? memberships.reduce((oldest, current) => (current.createdAt < oldest.createdAt ? current : oldest))
+            : null
 
-    const memberSince = oldestMembership.createdAt.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-    })
+    const memberSince = oldestMembership
+        ? oldestMembership.createdAt.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+        })
+        : "No memberships found"
 
     return {
         eventsAttended: attendances.length,
@@ -596,6 +599,7 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             include: {
                 club: {
                     select: {
+                        id: true,
                         name: true,
                     },
                 },
@@ -624,9 +628,11 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             time: event.time,
             location: event.location,
             clubName: event.club.name,
+            clubId: event.club.id, // Add clubId for navigation
             isRegistered: event.registrations.length > 0,
             registrationCount: event._count.registrations,
             capacity: event.maxAttendees,
+            duration: event.duration, // Add duration for active event detection
         }))
     } catch (error) {
         console.error("Error fetching dashboard events:", error)
@@ -683,6 +689,7 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
             registrationCount: event._count.registrations,
             attendanceCount: event._count.attendances,
             capacity: event.maxAttendees,
+            duration: event.duration, // Add this line
         }))
     } catch (error) {
         console.error("Error fetching owner events:", error)

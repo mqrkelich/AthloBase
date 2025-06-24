@@ -8,6 +8,32 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Badge} from "@/components/ui/badge"
 import {getOwnerEvents} from "@/app/dashboard/(overview)/_actions/dashboard-data"
 
+function isEventActive(eventDate: Date, eventTime: string, duration = 120): boolean {
+    const now = new Date()
+
+    // Create event start time
+    const [hours, minutes] = eventTime.split(":").map(Number)
+    const eventStart = new Date(eventDate)
+    eventStart.setHours(hours, minutes, 0, 0)
+
+    // Calculate event end time
+    const eventEnd = new Date(eventStart.getTime() + duration * 60 * 1000)
+
+    // Debug logging
+    console.log("Event Active Check:", {
+        now: now.toISOString(),
+        eventDate: eventDate.toISOString(),
+        eventTime,
+        eventStart: eventStart.toISOString(),
+        eventEnd: eventEnd.toISOString(),
+        duration,
+        isActive: now >= eventStart && now <= eventEnd,
+    })
+
+    // Check if current time is within event duration
+    return now >= eventStart && now <= eventEnd
+}
+
 interface DashboardEventsListProps {
     clubId?: string
 }
@@ -22,6 +48,7 @@ interface Event {
     registrationCount: number
     attendanceCount: number
     capacity: number | null
+    duration?: number // Add duration field
 }
 
 export function DashboardEventsList({clubId}: DashboardEventsListProps) {
@@ -98,46 +125,81 @@ export function DashboardEventsList({clubId}: DashboardEventsListProps) {
             </CardHeader>
             <CardContent>
                 <div className="space-y-4">
-                    {events.map((event) => (
-                        <div key={event.id} className="p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
-                            <div className="flex items-start justify-between mb-2">
-                                <h4 className="font-medium">{event.title}</h4>
-                                <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-0">
-                                    {event.registrationCount} registered
-                                </Badge>
-                            </div>
+                    {events.map((event) => {
+                        const eventDate = new Date(event.date)
+                        const isActive = isEventActive(eventDate, event.time, event.duration)
 
-                            <div className="space-y-1 text-sm text-white/60">
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4"/>
-                                    <span>
-                    {event.date.toLocaleDateString()} at {event.time}
-                  </span>
+                        console.log("Event processing:", {
+                            title: event.title,
+                            originalDate: event.date,
+                            parsedDate: eventDate.toISOString(),
+                            time: event.time,
+                            duration: event.duration,
+                            isActive,
+                        })
+
+                        return (
+                            <div
+                                key={event.id}
+                                className={`p-3 rounded-lg transition-colors ${
+                                    isActive
+                                        ? "bg-green-500/20 border border-green-500/30 hover:bg-green-500/30"
+                                        : "bg-white/5 hover:bg-white/10"
+                                }`}
+                            >
+                                <div className="flex items-start justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-medium">{event.title}</h4>
+                                        {isActive &&
+                                            <Badge className="bg-green-500 text-white border-0 text-xs">LIVE</Badge>}
+                                    </div>
+                                    <Badge variant="outline" className="bg-blue-500/20 text-blue-400 border-0">
+                                        {event.registrationCount} registered
+                                    </Badge>
                                 </div>
 
-                                {event.location && (
+                                <div className="space-y-1 text-sm text-white/60">
                                     <div className="flex items-center gap-2">
-                                        <MapPin className="h-4 w-4"/>
-                                        <span>{event.location}</span>
-                                    </div>
-                                )}
-
-                                <div className="flex items-center gap-4 mt-2">
-                                    <div className="flex items-center gap-1">
-                                        <Users className="h-4 w-4"/>
-                                        <span>{event.registrationCount} registered</span>
+                                        <Calendar className="h-4 w-4"/>
+                                        <span>
+                      {event.date.toLocaleDateString()} at {event.time}
+                    </span>
                                     </div>
 
-                                    {event.capacity && (
+                                    {event.location && (
+                                        <div className="flex items-center gap-2">
+                                            <MapPin className="h-4 w-4"/>
+                                            <span>{event.location}</span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-4 mt-2">
                                         <div className="flex items-center gap-1">
-                                            <Clock className="h-4 w-4"/>
-                                            <span>{event.capacity - event.registrationCount} spots left</span>
+                                            <Users className="h-4 w-4"/>
+                                            <span>{event.registrationCount} registered</span>
+                                        </div>
+
+                                        {event.capacity && (
+                                            <div className="flex items-center gap-1">
+                                                <Clock className="h-4 w-4"/>
+                                                <span>{event.capacity - event.registrationCount} spots left</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {isActive && (
+                                        <div className="mt-3 pt-2 border-t border-white/10">
+                                            <Button size="sm" className="w-full bg-green-600 hover:bg-green-700"
+                                                    asChild>
+                                                <Link href={`/dashboard/clubs/${clubId}/events/${event.id}/attendance`}>Mark
+                                                    Attendance</Link>
+                                            </Button>
                                         </div>
                                     )}
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </CardContent>
         </Card>

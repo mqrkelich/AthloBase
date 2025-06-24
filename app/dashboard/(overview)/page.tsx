@@ -8,15 +8,9 @@ import {DashboardMembersList} from "./_components/dashboard-members-list"
 import {DashboardPerformanceChart} from "./_components/dashboard-performance-chart"
 import {DashboardMemberPerformance} from "./_components/dashboard-member-performance"
 import {DashboardQuickActions} from "./_components/dashboard-quick-actions"
+import {ActiveEventsWidget} from "./_components/active-events-widget"
 
-interface DashboardPageProps {
-    searchParams: {
-        club?: string
-        role?: "owner" | "member"
-    }
-}
-
-export default async function DashboardPage({searchParams}: DashboardPageProps) {
+export default async function DashboardPage() {
     const session = await getCurrentUser()
     if (!session) {
         return <div>Please log in to view dashboard</div>
@@ -27,8 +21,9 @@ export default async function DashboardPage({searchParams}: DashboardPageProps) 
         return <div>User not found</div>
     }
 
-    const selectedClub = searchParams.club || "default"
-    const userRole = searchParams.role || "member"
+    const selectedClub = user.selectedClubId || "default"
+    const userRole: "owner" | "member" =
+        user.dashboardView === "owner" || user.dashboardView === "member" ? user.dashboardView : "member"
 
     return (
         <div className="p-6 space-y-6">
@@ -39,6 +34,10 @@ export default async function DashboardPage({searchParams}: DashboardPageProps) 
                     {userRole === "owner" ? "Manage your club and track performance" : "Track your activity and upcoming events"}
                 </p>
             </div>
+
+            {/* Active Events Widget - Show for both owners and members */}
+            {userRole === "owner" ? <ActiveEventsWidget clubId={selectedClub}/> :
+                <ActiveEventsWidget userId={user.id}/>}
 
             {/* Metrics Cards */}
             {userRole === "owner" ? (
