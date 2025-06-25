@@ -32,13 +32,27 @@ interface Event {
 function isEventActive(eventDate: Date, eventTime: string, duration = 120): boolean {
     const now = new Date()
 
+    // Ensure eventDate is a proper Date object
+    const eventDateObj = eventDate instanceof Date ? eventDate : new Date(eventDate)
+
     // Create event start time
     const [hours, minutes] = eventTime.split(":").map(Number)
-    const eventStart = new Date(eventDate)
+    const eventStart = new Date(eventDateObj)
     eventStart.setHours(hours, minutes, 0, 0)
 
-    // Calculate event end time
+    // Calculate event end time (duration is in minutes)
     const eventEnd = new Date(eventStart.getTime() + duration * 60 * 1000)
+
+    // Debug logging
+    console.log("Member Event Active Check:", {
+        now: now.toISOString(),
+        eventDate: eventDateObj.toISOString(),
+        eventTime,
+        eventStart: eventStart.toISOString(),
+        eventEnd: eventEnd.toISOString(),
+        duration,
+        isActive: now >= eventStart && now <= eventEnd,
+    })
 
     // Check if current time is within event duration
     return now >= eventStart && now <= eventEnd
@@ -135,8 +149,14 @@ export function DashboardMemberEvents({userId}: DashboardMemberEventsProps) {
     }
 
     // Separate active and upcoming events
-    const activeEvents = events.filter((event) => isEventActive(event.date, event.time, event.duration))
-    const upcomingEvents = events.filter((event) => !isEventActive(event.date, event.time, event.duration))
+    const activeEvents = events.filter((event) => {
+        const eventDuration = event.duration || 60 // Default to 60 minutes
+        return isEventActive(event.date, event.time, eventDuration)
+    })
+    const upcomingEvents = events.filter((event) => {
+        const eventDuration = event.duration || 60 // Default to 60 minutes
+        return !isEventActive(event.date, event.time, eventDuration)
+    })
 
     return (
         <div className="space-y-6">

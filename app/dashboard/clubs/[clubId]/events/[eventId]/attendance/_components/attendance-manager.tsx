@@ -8,6 +8,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Badge} from "@/components/ui/badge"
 import {toast} from "sonner"
 import {Check, X, Clock, User} from "lucide-react"
+import {useRouter} from "next/navigation"
 
 interface Registration {
     id: string
@@ -52,10 +53,11 @@ export function AttendanceManager({
                                       eventId,
                                       registrations,
                                       attendances: initialAttendances,
-                                      userId
+                                      userId,
                                   }: AttendanceManagerProps) {
     const [attendances, setAttendances] = useState(initialAttendances)
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
 
     const handleMarkAttendance = async (userId: string, status: "present" | "absent") => {
         startTransition(async () => {
@@ -73,11 +75,15 @@ export function AttendanceManager({
                     const user = registrations.find((reg) => reg.userId === userId)?.user
 
                     if (existing) {
-                        return prev.map((att) => (att.userId === userId ? {
-                            ...att,
-                            status,
-                            checkedInAt: new Date()
-                        } : att))
+                        return prev.map((att) =>
+                            att.userId === userId
+                                ? {
+                                    ...att,
+                                    status,
+                                    checkedInAt: new Date(),
+                                }
+                                : att,
+                        )
                     } else if (user) {
                         return [
                             ...prev,
@@ -98,6 +104,9 @@ export function AttendanceManager({
                 })
 
                 toast.success(`Attendance marked as ${status}`)
+
+                // Refresh the page to update all dashboard metrics
+                router.refresh()
             } catch (error) {
                 toast.error("Failed to mark attendance")
             }
@@ -252,21 +261,18 @@ export function AttendanceManager({
             {/* Quick Actions for Test Users */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Quick Test Actions</CardTitle>
+                    <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="flex gap-2 flex-wrap">
                         <Button
                             variant="outline"
                             onClick={() => {
-
-
                                 handleMarkAttendance(userId, "present")
-
                             }}
                             disabled={isPending}
                         >
-                            Mark Present
+                            Mark Yourself Present
                         </Button>
                         <Button
                             variant="outline"

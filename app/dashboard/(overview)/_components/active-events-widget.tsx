@@ -31,16 +31,48 @@ interface Event {
     isRegistered?: boolean
 }
 
-function isEventActive(eventDate: Date, eventTime: string, duration = 120): boolean {
+function isEventActive(eventDate: Date, eventTime: string, duration = 60): boolean {
     const now = new Date()
 
-    // Create event start time
-    const [hours, minutes] = eventTime.split(":").map(Number)
-    const eventStart = new Date(eventDate)
-    eventStart.setHours(hours, minutes, 0, 0)
+    // Ensure eventDate is a proper Date object
+    const eventDateObj = eventDate instanceof Date ? eventDate : new Date(eventDate)
 
-    // Calculate event end time
+    // Parse the time string
+    const [hours, minutes] = eventTime.split(":").map(Number)
+
+    // Create event start time using the event date but with local timezone
+    const eventStart = new Date(
+        eventDateObj.getFullYear(),
+        eventDateObj.getMonth(),
+        eventDateObj.getDate(),
+        hours,
+        minutes,
+        0,
+        0,
+    )
+
+    // Calculate event end time (duration is in minutes)
     const eventEnd = new Date(eventStart.getTime() + duration * 60 * 1000)
+
+    // Debug logging
+    console.log("Event Active Check:", {
+        eventTitle: "Event", // We don't have title here, but useful for debugging
+        now: now.toISOString(),
+        nowLocal: now.toLocaleString(),
+        eventDate: eventDateObj.toISOString(),
+        eventTime,
+        eventStart: eventStart.toISOString(),
+        eventStartLocal: eventStart.toLocaleString(),
+        eventEnd: eventEnd.toISOString(),
+        eventEndLocal: eventEnd.toLocaleString(),
+        duration,
+        isActive: now >= eventStart && now <= eventEnd,
+        nowTime: now.getTime(),
+        startTime: eventStart.getTime(),
+        endTime: eventEnd.getTime(),
+        timeDiff: now.getTime() - eventStart.getTime(),
+        timeUntilEnd: eventEnd.getTime() - now.getTime(),
+    })
 
     // Check if current time is within event duration
     return now >= eventStart && now <= eventEnd
@@ -67,12 +99,34 @@ export function ActiveEventsWidget({clubId, userId}: ActiveEventsWidgetProps) {
                     data = memberData || []
                 }
 
+                console.log(
+                    "All events loaded:",
+                    data.map((event) => ({
+                        title: event.title,
+                        date: event.date,
+                        time: event.time,
+                        duration: event.duration,
+                    })),
+                )
+
                 // Filter for active events
                 const activeEvents = data.filter((event) => {
                     const eventDate = new Date(event.date)
-                    return isEventActive(eventDate, event.time, event.duration)
+                    const eventDuration = event.duration || 60 // Default to 60 minutes if not specified
+                    const isActive = isEventActive(eventDate, event.time, eventDuration)
+
+                    console.log("Filtering event:", {
+                        title: event.title,
+                        date: event.date,
+                        time: event.time,
+                        duration: eventDuration,
+                        isActive,
+                    })
+
+                    return isActive
                 })
 
+                console.log("Active events found:", activeEvents.length)
                 setEvents(activeEvents)
             } catch (error) {
                 console.error("Failed to load active events:", error)
@@ -83,8 +137,8 @@ export function ActiveEventsWidget({clubId, userId}: ActiveEventsWidgetProps) {
 
         loadEvents()
 
-        // Refresh every minute to update active status
-        const interval = setInterval(loadEvents, 60000)
+        // Refresh every 30 seconds to update active status more frequently
+        const interval = setInterval(loadEvents, 30000)
         return () => clearInterval(interval)
     }, [clubId, userId, isOwnerView, isMemberView])
 
