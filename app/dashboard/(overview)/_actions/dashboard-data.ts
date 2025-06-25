@@ -121,6 +121,8 @@ export async function getMemberDashboardMetrics(userId: string) {
     const user = await getUserById(session.id!)
     if (!user || user.id !== userId) return null
 
+    console.log("Getting member dashboard metrics for userId:", userId)
+
     // Get user's club memberships
     const memberships = await db.clubMembers.findMany({
         where: {
@@ -137,8 +139,12 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
+    console.log("Found memberships:", memberships)
+
     const clubIds = memberships.map((m) => m.clubId)
     const clubNames = memberships.map((m) => m.club.name)
+
+    console.log("Club IDs:", clubIds)
 
     // Get ALL events from user's clubs first
     const clubEvents = await db.event.findMany({
@@ -155,6 +161,8 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
+    console.log("Found club events:", clubEvents.length)
+
     const eventIds = clubEvents.map((e) => e.id)
 
     // Get events attended - Query by eventId being in the user's club events
@@ -168,6 +176,8 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
+    console.log("Found attendances:", attendances)
+
     // Get events attended this month
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
@@ -178,22 +188,77 @@ export async function getMemberDashboardMetrics(userId: string) {
         return event && event.date >= startOfMonth
     }).length
 
-    // Get upcoming events
-    const upcomingEvents = await db.event.findMany({
+    console.log("Attendances this month:", attendancesThisMonth)
+
+    // Get upcoming events count (including currently active events)
+    const now = new Date()
+    const upcomingEventsCount = await db.event.count({
         where: {
             clubId: {
                 in: clubIds,
             },
-            date: {
-                gte: new Date(),
-            },
-        },
-        orderBy: {
-            date: "asc",
+            OR: [
+                {
+                    date: {
+                        gt: now,
+                    },
+                },
+                {
+                    AND: [
+                        {
+                            date: {
+                                gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+                            },
+                        },
+                        {
+                            date: {
+                                lt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
+                            },
+                        },
+                    ],
+                },
+            ],
         },
     })
 
-    const nextEvent = upcomingEvents[0]
+    // Get next event (including currently active events)
+    const nextEvent = await db.event.findFirst({
+        where: {
+            clubId: {
+                in: clubIds,
+            },
+            OR: [
+                {
+                    date: {
+                        gt: now,
+                    },
+                },
+                {
+                    AND: [
+                        {
+                            date: {
+                                gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
+                            },
+                        },
+                        {
+                            date: {
+                                lt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
+                            },
+                        },
+                    ],
+                },
+            ],
+        },
+        orderBy: [
+            {
+                date: "asc",
+            },
+            {
+                time: "asc",
+            },
+        ],
+    })
+
     const nextEventDate = nextEvent ? `${nextEvent.date.toLocaleDateString()} at ${nextEvent.time}` : "No upcoming events"
 
     // Calculate attendance rate - Get registrations for events in user's clubs
@@ -206,7 +271,11 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
+    console.log("Found registrations:", registrations.length)
+
     const attendanceRate = registrations.length > 0 ? Math.round((attendances.length / registrations.length) * 100) : 0
+
+    console.log("Calculated attendance rate:", attendanceRate)
 
     // Get member since date
     const oldestMembership =
@@ -221,18 +290,27 @@ export async function getMemberDashboardMetrics(userId: string) {
         })
         : "No memberships found"
 
-    return {
+    const result = {
         eventsAttended: attendances.length,
         eventsThisMonth: attendancesThisMonth,
         totalClubs: memberships.length,
         clubNames,
-        upcomingEvents: upcomingEvents.length,
+        upcomingEvents: upcomingEventsCount,
         nextEventDate,
         attendanceRate,
         memberSince,
     }
+
+    console.log("Final member metrics:", result)
+
+    return result
 }
 
+export async function refreshMemberMetrics(userId: string) {
+    // This function forces a fresh calculation of member metrics
+    // by bypassing any potential caching issues
+    return await getMemberDashboardMetrics(userId)
+}
 
 export async function getClubMembers(clubId: string, limit = 4) {
     const session = await getCurrentUser()
@@ -294,7 +372,7 @@ export async function getClubMembers(clubId: string, limit = 4) {
     const eventIds = clubEvents.map((e) => e.id)
 
     // Get attendance data for each member
-    return await Promise.all(
+    const membersWithStats = await Promise.all(
         members.map(async (member) => {
             const registrations = await db.eventRegistration.count({
                 where: {
@@ -330,6 +408,8 @@ export async function getClubMembers(clubId: string, limit = 4) {
             }
         }),
     )
+
+    return membersWithStats
 }
 
 export async function getClubPerformanceData(clubId: string) {
@@ -614,14 +694,19 @@ export async function getMemberPerformanceData(userId: string) {
 
 export async function getDashboardEvents(userId: string, limit = 5) {
     try {
+        console.log("getDashboardEvents called with:", {userId, limit})
 
         const session = await getCurrentUser()
+        console.log("Session:", session)
         if (!session) {
+            console.log("No session found")
             return []
         }
 
         const user = await getUserById(session.id!)
+        console.log("User:", user)
         if (!user || user.id !== userId) {
+            console.log("User not found or ID mismatch")
             return []
         }
 
@@ -634,21 +719,21 @@ export async function getDashboardEvents(userId: string, limit = 5) {
                 clubId: true,
             },
         })
+        console.log("User memberships:", memberships)
 
         const clubIds = memberships.map((m) => m.clubId)
+        console.log("Club IDs:", clubIds)
 
-        // Create a date that represents the start of today in local timezone
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        if (clubIds.length === 0) {
+            console.log("No clubs found for user")
+            return []
+        }
 
-        // Get upcoming events (including today's events)
-        const upcomingEvents = await db.event.findMany({
+        // Get all events from user's clubs
+        const allEvents = await db.event.findMany({
             where: {
                 clubId: {
                     in: clubIds,
-                },
-                date: {
-                    gte: today, // Use start of today instead of current moment
                 },
             },
             include: {
@@ -669,14 +754,71 @@ export async function getDashboardEvents(userId: string, limit = 5) {
                     },
                 },
             },
-            orderBy: {
-                date: "asc",
-            },
-            take: limit,
+            orderBy: [
+                {
+                    date: "asc",
+                },
+                {
+                    time: "asc",
+                },
+            ],
         })
 
+        console.log("All events from database:", allEvents.length)
 
-        return upcomingEvents.map((event) => ({
+        // Filter events to show upcoming AND currently active events
+        const now = new Date()
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+        console.log("Current time:", now.toISOString())
+        console.log("Today date:", today.toISOString())
+
+        const upcomingAndActiveEvents = allEvents
+            .filter((event) => {
+                const eventDate = new Date(event.date)
+                const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+
+                // If event is on a future date, it's upcoming
+                if (eventDateOnly > today) {
+                    console.log(`Event "${event.title}" is on future date:`, eventDateOnly.toISOString())
+                    return true
+                }
+
+                // If event is today, check if it's upcoming OR currently active
+                if (eventDateOnly.getTime() === today.getTime()) {
+                    const [hours, minutes] = event.time.split(":").map(Number)
+                    const eventDateTime = new Date(eventDateOnly)
+                    eventDateTime.setHours(hours, minutes, 0, 0)
+
+                    // Calculate event end time (start time + duration)
+                    const eventEndTime = new Date(eventDateTime.getTime() + (event.duration || 60) * 60 * 1000)
+
+                    const isUpcoming = eventDateTime > now
+                    const isCurrentlyActive = now >= eventDateTime && now <= eventEndTime
+
+                    console.log(`Event "${event.title}" is today:`, {
+                        eventTime: event.time,
+                        eventDateTime: eventDateTime.toISOString(),
+                        eventEndTime: eventEndTime.toISOString(),
+                        now: now.toISOString(),
+                        duration: event.duration,
+                        isUpcoming,
+                        isCurrentlyActive,
+                        shouldShow: isUpcoming || isCurrentlyActive,
+                    })
+
+                    return isUpcoming || isCurrentlyActive
+                }
+
+                // Event is in the past
+                console.log(`Event "${event.title}" is in the past:`, eventDateOnly.toISOString())
+                return false
+            })
+            .slice(0, limit)
+
+        console.log("Filtered upcoming and active events:", upcomingAndActiveEvents.length)
+
+        const mappedEvents = upcomingAndActiveEvents.map((event) => ({
             id: event.id,
             title: event.title,
             description: event.description,
@@ -690,6 +832,9 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             capacity: event.maxAttendees,
             duration: event.duration || 60,
         }))
+
+        console.log("Final mapped events:", mappedEvents)
+        return mappedEvents
     } catch (error) {
         console.error("Error fetching dashboard events:", error)
         return []
@@ -698,15 +843,19 @@ export async function getDashboardEvents(userId: string, limit = 5) {
 
 export async function getOwnerEvents(clubId: string, limit = 5) {
     try {
+        console.log("getOwnerEvents called with:", {clubId, limit})
 
         const session = await getCurrentUser()
+        console.log("Session:", session)
         if (!session) {
+            console.log("No session found")
             return null
         }
 
         const user = await getUserById(session.id!)
-
+        console.log("User:", user)
         if (!user) {
+            console.log("No user found")
             return []
         }
 
@@ -717,21 +866,17 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
                 clubOwnerId: user.id,
             },
         })
+        console.log("Club found:", club)
 
         if (!club) {
+            console.log("No club found or user is not owner")
             return []
         }
 
-        // Create a date that represents the start of today in local timezone
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        const events = await db.event.findMany({
+        // Get all events for this club
+        const allEvents = await db.event.findMany({
             where: {
                 clubId: clubId,
-                date: {
-                    gte: today, // Use start of today instead of current moment
-                },
             },
             include: {
                 _count: {
@@ -741,13 +886,71 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
                     },
                 },
             },
-            orderBy: {
-                date: "asc",
-            },
-            take: limit,
+            orderBy: [
+                {
+                    date: "asc",
+                },
+                {
+                    time: "asc",
+                },
+            ],
         })
 
-        return events.map((event) => ({
+        console.log("All events from database:", allEvents.length)
+
+        // Filter events to show upcoming AND currently active events
+        const now = new Date()
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+        console.log("Current time:", now.toISOString())
+        console.log("Today date:", today.toISOString())
+
+        const upcomingAndActiveEvents = allEvents
+            .filter((event) => {
+                const eventDate = new Date(event.date)
+                const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+
+                // If event is on a future date, it's upcoming
+                if (eventDateOnly > today) {
+                    console.log(`Owner Event "${event.title}" is on future date:`, eventDateOnly.toISOString())
+                    return true
+                }
+
+                // If event is today, check if it's upcoming OR currently active
+                if (eventDateOnly.getTime() === today.getTime()) {
+                    const [hours, minutes] = event.time.split(":").map(Number)
+                    const eventDateTime = new Date(eventDateOnly)
+                    eventDateTime.setHours(hours, minutes, 0, 0)
+
+                    // Calculate event end time (start time + duration)
+                    const eventEndTime = new Date(eventDateTime.getTime() + (event.duration || 60) * 60 * 1000)
+
+                    const isUpcoming = eventDateTime > now
+                    const isCurrentlyActive = now >= eventDateTime && now <= eventEndTime
+
+                    console.log(`Owner Event "${event.title}" is today:`, {
+                        eventTime: event.time,
+                        eventDateTime: eventDateTime.toISOString(),
+                        eventEndTime: eventEndTime.toISOString(),
+                        now: now.toISOString(),
+                        duration: event.duration,
+                        isUpcoming,
+                        isCurrentlyActive,
+                        shouldShow: isUpcoming || isCurrentlyActive,
+                    })
+
+                    return isUpcoming || isCurrentlyActive
+                }
+
+                // Event is in the past
+                console.log(`Owner Event "${event.title}" is in the past:`, eventDateOnly.toISOString())
+                return false
+            })
+            .slice(0, limit)
+
+        console.log("Filtered upcoming and active events:", upcomingAndActiveEvents.length)
+
+        const mappedEvents = upcomingAndActiveEvents.map((event) => ({
             id: event.id,
             title: event.title,
             description: event.description,
@@ -759,6 +962,9 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
             capacity: event.maxAttendees,
             duration: event.duration || 60,
         }))
+
+        console.log("Final mapped events:", mappedEvents)
+        return mappedEvents
     } catch (error) {
         console.error("Error fetching owner events:", error)
         return []

@@ -25,49 +25,64 @@ export default async function DashboardPage() {
     const userRole: "owner" | "member" =
         user.dashboardView === "owner" || user.dashboardView === "member" ? user.dashboardView : "member"
 
+    if (userRole === "member") {
+        return (
+            <div className="p-6 space-y-6">
+                {/* Header */}
+                <div>
+                    <h1 className="text-2xl font-bold text-white">My Dashboard</h1>
+                    <p className="text-white/60">Track your activity and upcoming events</p>
+                </div>
+
+                {/* Active Events Widget */}
+                <ActiveEventsWidget userId={user.id}/>
+
+                {/* Metrics Cards */}
+                <DashboardMemberMetrics userId={user.id}/>
+
+                {/* Main Content - 3 Column Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Left Column - Events (spans 2 columns) */}
+                    <div className="lg:col-span-2">
+                        <DashboardMemberEvents userId={user.id}/>
+                    </div>
+
+                    {/* Right Column - Performance and Quick Actions */}
+                    <div className="space-y-6">
+                        <DashboardMemberPerformance userId={user.id}/>
+                        <DashboardQuickActions userRole={userRole} clubId={selectedClub}/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Owner Dashboard (unchanged)
     return (
         <div className="p-6 space-y-6">
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-white">{userRole === "owner" ? "Club Dashboard" : "My Dashboard"}</h1>
-                <p className="text-white/60">
-                    {userRole === "owner" ? "Manage your club and track performance" : "Track your activity and upcoming events"}
-                </p>
+                <h1 className="text-2xl font-bold text-white">Club Dashboard</h1>
+                <p className="text-white/60">Manage your club and track performance</p>
             </div>
 
-            {/* Active Events Widget - Show for both owners and members */}
-            {userRole === "owner" ? <ActiveEventsWidget clubId={selectedClub}/> :
-                <ActiveEventsWidget userId={user.id}/>}
+            {/* Active Events Widget */}
+            <ActiveEventsWidget clubId={selectedClub}/>
 
             {/* Metrics Cards */}
-            {userRole === "owner" ? (
-                <DashboardMetricCards clubId={selectedClub}/>
-            ) : (
-                <DashboardMemberMetrics userId={user.id}/>
-            )}
+            <DashboardMetricCards clubId={selectedClub}/>
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Events */}
-                {userRole === "owner" ? (
-                    <DashboardEventsList clubId={selectedClub}/>
-                ) : (
-                    <DashboardMemberEvents userId={user.id}/>
-                )}
-
-                {/* Members/Performance */}
-                {userRole === "owner" ? (
-                    <DashboardMembersList clubId={selectedClub} userRole="owner"/>
-                ) : (
-                    <DashboardMemberPerformance userId={user.id}/>
-                )}
+                <DashboardEventsList clubId={selectedClub}/>
+                <DashboardMembersList clubId={selectedClub} userRole="owner"/>
             </div>
 
-            {/* Performance Chart */}
-            {userRole === "owner" && <DashboardPerformanceChart clubId={selectedClub}/>}
-
-            {/* Quick Actions */}
-            <DashboardQuickActions userRole={userRole} clubId={selectedClub}/>
+            {/* Bottom Grid - Performance Chart and Quick Actions */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <DashboardPerformanceChart clubId={selectedClub}/>
+                <DashboardQuickActions userRole={userRole} clubId={selectedClub}/>
+            </div>
         </div>
     )
 }

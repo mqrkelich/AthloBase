@@ -16,7 +16,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 
 interface DashboardQuickActionsProps {
     userRole?: "owner" | "member"
-    clubId?: string // Add clubId prop
+    clubId?: string
 }
 
 export function DashboardQuickActions({userRole = "member", clubId}: DashboardQuickActionsProps) {

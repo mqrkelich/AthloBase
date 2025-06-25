@@ -48,6 +48,7 @@ interface Event {
     type: string
     isRegistered?: boolean
     hasAttended?: boolean
+    duration?: number
 }
 
 interface CustomStat {
@@ -159,8 +160,67 @@ export default function ClubMemberClient({club, clubId, currentUser, events: ini
         }
     }
 
-    const upcomingEvents = events.filter((event) => new Date(event.date) >= new Date()).slice(0, 3)
-    const recentEvents = events.filter((event) => new Date(event.date) < new Date()).slice(0, 3)
+    // Helper function to check if an event is upcoming or currently active
+    const isEventUpcomingOrActive = (event: Event) => {
+        const now = new Date()
+        const eventDate = new Date(event.date)
+        const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+        // If event is on a future date, it's upcoming
+        if (eventDateOnly > today) {
+            return true
+        }
+
+        // If event is today, check if it's upcoming OR currently active
+        if (eventDateOnly.getTime() === today.getTime()) {
+            const [hours, minutes] = event.time.split(":").map(Number)
+            const eventDateTime = new Date(eventDateOnly)
+            eventDateTime.setHours(hours, minutes, 0, 0)
+
+            // Calculate event end time (start time + duration)
+            const eventEndTime = new Date(eventDateTime.getTime() + (event.duration || 60) * 60 * 1000)
+
+            const isUpcoming = eventDateTime > now
+            const isCurrentlyActive = now >= eventDateTime && now <= eventEndTime
+
+            return isUpcoming || isCurrentlyActive
+        }
+
+        // Event is in the past
+        return false
+    }
+
+    // Helper function to check if an event is in the past
+    const isEventPast = (event: Event) => {
+        const now = new Date()
+        const eventDate = new Date(event.date)
+        const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+        // If event is on a past date, it's past
+        if (eventDateOnly < today) {
+            return true
+        }
+
+        // If event is today, check if it has ended
+        if (eventDateOnly.getTime() === today.getTime()) {
+            const [hours, minutes] = event.time.split(":").map(Number)
+            const eventDateTime = new Date(eventDateOnly)
+            eventDateTime.setHours(hours, minutes, 0, 0)
+
+            // Calculate event end time (start time + duration)
+            const eventEndTime = new Date(eventDateTime.getTime() + (event.duration || 60) * 60 * 1000)
+
+            return now > eventEndTime
+        }
+
+        // Event is in the future
+        return false
+    }
+
+    const upcomingEvents = events.filter(isEventUpcomingOrActive).slice(0, 3)
+    const recentEvents = events.filter(isEventPast).slice(0, 3)
 
     const defaultMemberStats = {
         eventsRegistered: memberStats?.eventsRegistered || 0,
