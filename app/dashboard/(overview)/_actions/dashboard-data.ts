@@ -121,8 +121,6 @@ export async function getMemberDashboardMetrics(userId: string) {
     const user = await getUserById(session.id!)
     if (!user || user.id !== userId) return null
 
-    console.log("Getting member dashboard metrics for userId:", userId)
-
     // Get user's club memberships
     const memberships = await db.clubMembers.findMany({
         where: {
@@ -139,12 +137,8 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found memberships:", memberships)
-
     const clubIds = memberships.map((m) => m.clubId)
     const clubNames = memberships.map((m) => m.club.name)
-
-    console.log("Club IDs:", clubIds)
 
     // Get ALL events from user's clubs first
     const clubEvents = await db.event.findMany({
@@ -161,8 +155,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found club events:", clubEvents.length)
-
     const eventIds = clubEvents.map((e) => e.id)
 
     // Get events attended - Query by eventId being in the user's club events
@@ -176,8 +168,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found attendances:", attendances)
-
     // Get events attended this month
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
@@ -187,8 +177,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         const event = clubEvents.find((e) => e.id === attendance.eventId)
         return event && event.date >= startOfMonth
     }).length
-
-    console.log("Attendances this month:", attendancesThisMonth)
 
     // Get upcoming events
     const upcomingEvents = await db.event.findMany({
@@ -218,11 +206,7 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found registrations:", registrations.length)
-
     const attendanceRate = registrations.length > 0 ? Math.round((attendances.length / registrations.length) * 100) : 0
-
-    console.log("Calculated attendance rate:", attendanceRate)
 
     // Get member since date
     const oldestMembership =
@@ -237,7 +221,7 @@ export async function getMemberDashboardMetrics(userId: string) {
         })
         : "No memberships found"
 
-    const result = {
+    return {
         eventsAttended: attendances.length,
         eventsThisMonth: attendancesThisMonth,
         totalClubs: memberships.length,
@@ -247,10 +231,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         attendanceRate,
         memberSince,
     }
-
-    console.log("Final member metrics:", result)
-
-    return result
 }
 
 
@@ -314,7 +294,7 @@ export async function getClubMembers(clubId: string, limit = 4) {
     const eventIds = clubEvents.map((e) => e.id)
 
     // Get attendance data for each member
-    const membersWithStats = await Promise.all(
+    return await Promise.all(
         members.map(async (member) => {
             const registrations = await db.eventRegistration.count({
                 where: {
@@ -350,8 +330,6 @@ export async function getClubMembers(clubId: string, limit = 4) {
             }
         }),
     )
-
-    return membersWithStats
 }
 
 export async function getClubPerformanceData(clubId: string) {
@@ -636,19 +614,14 @@ export async function getMemberPerformanceData(userId: string) {
 
 export async function getDashboardEvents(userId: string, limit = 5) {
     try {
-        console.log("getDashboardEvents called with:", {userId, limit})
 
         const session = await getCurrentUser()
-        console.log("Session:", session)
         if (!session) {
-            console.log("No session found")
             return []
         }
 
         const user = await getUserById(session.id!)
-        console.log("User:", user)
         if (!user || user.id !== userId) {
-            console.log("User not found or ID mismatch")
             return []
         }
 
@@ -661,15 +634,12 @@ export async function getDashboardEvents(userId: string, limit = 5) {
                 clubId: true,
             },
         })
-        console.log("User memberships:", memberships)
 
         const clubIds = memberships.map((m) => m.clubId)
-        console.log("Club IDs:", clubIds)
 
         // Create a date that represents the start of today in local timezone
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        console.log("Today start:", today)
 
         // Get upcoming events (including today's events)
         const upcomingEvents = await db.event.findMany({
@@ -705,9 +675,8 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             take: limit,
         })
 
-        console.log("Raw upcoming events from database:", upcomingEvents)
 
-        const mappedEvents = upcomingEvents.map((event) => ({
+        return upcomingEvents.map((event) => ({
             id: event.id,
             title: event.title,
             description: event.description,
@@ -721,9 +690,6 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             capacity: event.maxAttendees,
             duration: event.duration || 60,
         }))
-
-        console.log("Mapped member events:", mappedEvents)
-        return mappedEvents
     } catch (error) {
         console.error("Error fetching dashboard events:", error)
         return []
@@ -732,19 +698,15 @@ export async function getDashboardEvents(userId: string, limit = 5) {
 
 export async function getOwnerEvents(clubId: string, limit = 5) {
     try {
-        console.log("getOwnerEvents called with:", {clubId, limit})
 
         const session = await getCurrentUser()
-        console.log("Session:", session)
         if (!session) {
-            console.log("No session found")
             return null
         }
 
         const user = await getUserById(session.id!)
-        console.log("User:", user)
+
         if (!user) {
-            console.log("No user found")
             return []
         }
 
@@ -755,17 +717,14 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
                 clubOwnerId: user.id,
             },
         })
-        console.log("Club found:", club)
 
         if (!club) {
-            console.log("No club found or user is not owner")
             return []
         }
 
         // Create a date that represents the start of today in local timezone
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        console.log("Today start:", today)
 
         const events = await db.event.findMany({
             where: {
@@ -788,9 +747,7 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
             take: limit,
         })
 
-        console.log("Raw events from database:", events)
-
-        const mappedEvents = events.map((event) => ({
+        return events.map((event) => ({
             id: event.id,
             title: event.title,
             description: event.description,
@@ -802,9 +759,6 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
             capacity: event.maxAttendees,
             duration: event.duration || 60,
         }))
-
-        console.log("Mapped events:", mappedEvents)
-        return mappedEvents
     } catch (error) {
         console.error("Error fetching owner events:", error)
         return []
