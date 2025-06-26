@@ -9,6 +9,8 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {Badge} from "@/components/ui/badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
 import {getClubMembers} from "@/app/dashboard/(overview)/_actions/dashboard-data"
+import {MemberProfileDialog} from "./member-profile-dialog"
+import {MemberAttendanceDialog} from "./member-attendance-dialog"
 
 interface DashboardMembersListProps {
     clubId?: string
@@ -19,8 +21,8 @@ interface Member {
     id: string
     name: string
     email: string | null
-    avatar: string | null // Change from optional to nullable
-    role: string // Change from union type to string to match API data
+    avatar: string | null
+    role: string
     joinedAt: string
     lastActive: string
     attendanceRate: number
@@ -30,6 +32,9 @@ interface Member {
 export function DashboardMembersList({clubId, userRole}: DashboardMembersListProps) {
     const [members, setMembers] = useState<Member[]>([])
     const [loading, setLoading] = useState(true)
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null)
+    const [showProfileDialog, setShowProfileDialog] = useState(false)
+    const [showAttendanceDialog, setShowAttendanceDialog] = useState(false)
 
     useEffect(() => {
         async function loadMembers() {
@@ -78,6 +83,16 @@ export function DashboardMembersList({clubId, userRole}: DashboardMembersListPro
         }
     }
 
+    const handleViewProfile = (member: Member) => {
+        setSelectedMember(member)
+        setShowProfileDialog(true)
+    }
+
+    const handleViewAttendance = (member: Member) => {
+        setSelectedMember(member)
+        setShowAttendanceDialog(true)
+    }
+
     if (loading) {
         return (
             <Card className="bg-zinc-900/50 border-white/10 text-white">
@@ -121,74 +136,105 @@ export function DashboardMembersList({clubId, userRole}: DashboardMembersListPro
     }
 
     return (
-        <Card className="bg-zinc-900/50 border-white/10 text-white">
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                    <CardTitle>{userRole === "owner" ? "Recent Members" : "Active Members"}</CardTitle>
-                    <CardDescription className="text-white/60">
-                        {userRole === "owner" ? "Newest additions to your club" : "Most active members in your clubs"}
-                    </CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" asChild>
-                    <Link href={userRole === "owner" ? `/dashboard/clubs/${clubId}?tab=members` : "/dashboard/members"}>
-                        View All
-                    </Link>
-                </Button>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                    {members.map((member) => (
-                        <div key={member.id}
-                             className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
-                            <Avatar className="h-10 w-10">
-                                <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name}/>
-                                <AvatarFallback
-                                    className="bg-white/10 text-white">{getInitials(member.name)}</AvatarFallback>
-                            </Avatar>
+        <>
+            <Card className="bg-zinc-900/50 border-white/10 text-white">
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                        <CardTitle>{userRole === "owner" ? "Recent Members" : "Active Members"}</CardTitle>
+                        <CardDescription className="text-white/60">
+                            {userRole === "owner" ? "Newest additions to your club" : "Most active members in your clubs"}
+                        </CardDescription>
+                    </div>
+                    <Button variant="ghost" size="sm" asChild>
+                        <Link
+                            href={userRole === "owner" ? `/dashboard/clubs/${clubId}?tab=members` : "/dashboard/members"}>
+                            View All
+                        </Link>
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {members.map((member) => (
+                            <div
+                                key={member.id}
+                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors"
+                            >
+                                <Avatar className="h-10 w-10">
+                                    <AvatarImage src={member.avatar || "/placeholder.svg"} alt={member.name}/>
+                                    <AvatarFallback
+                                        className="bg-white/10 text-white">{getInitials(member.name)}</AvatarFallback>
+                                </Avatar>
 
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                    <p className="font-medium truncate">{member.name}</p>
-                                    {getRoleIcon(member.role)}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-medium truncate">{member.name}</p>
+                                        {getRoleIcon(member.role)}
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <Badge variant="outline"
+                                               className={`text-xs border-0 ${getRoleBadgeColor(member.role)}`}>
+                                            {member.role}
+                                        </Badge>
+                                        {userRole === "owner" && (
+                                            <span
+                                                className="text-xs text-white/60">{member.attendanceRate}% attendance</span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-white/60 mt-0.5">
+                                        {userRole === "owner"
+                                            ? `Joined ${new Date(member.joinedAt).toLocaleDateString()}`
+                                            : `${member.eventsAttended} events attended`}
+                                    </p>
                                 </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <Badge variant="outline"
-                                           className={`text-xs border-0 ${getRoleBadgeColor(member.role)}`}>
-                                        {member.role}
-                                    </Badge>
-                                    {userRole === "owner" && (
-                                        <span
-                                            className="text-xs text-white/60">{member.attendanceRate}% attendance</span>
-                                    )}
-                                </div>
-                                <p className="text-xs text-white/60 mt-0.5">
-                                    {userRole === "owner"
-                                        ? `Joined ${new Date(member.joinedAt).toLocaleDateString()}`
-                                        : `${member.eventsAttended} events attended`}
-                                </p>
+
+                                {userRole === "owner" && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                <MoreHorizontal className="h-4 w-4"/>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="bg-zinc-800 border-white/10">
+                                            <DropdownMenuItem
+                                                className="text-white hover:bg-white/10 cursor-pointer"
+                                                onClick={() => handleViewProfile(member)}
+                                            >
+                                                View Profile
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="text-white hover:bg-white/10 cursor-pointer">
+                                                Send Message
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                className="text-white hover:bg-white/10 cursor-pointer"
+                                                onClick={() => handleViewAttendance(member)}
+                                            >
+                                                View Attendance
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                )}
                             </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
 
-                            {userRole === "owner" && (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                                            <MoreHorizontal className="h-4 w-4"/>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="bg-zinc-800 border-white/10">
-                                        <DropdownMenuItem className="text-white hover:bg-white/10">View
-                                            Profile</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-white hover:bg-white/10">Send
-                                            Message</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-white hover:bg-white/10">View
-                                            Attendance</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+            {selectedMember && (
+                <>
+                    <MemberProfileDialog
+                        open={showProfileDialog}
+                        onOpenChange={setShowProfileDialog}
+                        memberId={selectedMember.id}
+                        clubId={clubId || ""}
+                    />
+                    <MemberAttendanceDialog
+                        open={showAttendanceDialog}
+                        onOpenChange={setShowAttendanceDialog}
+                        memberId={selectedMember.id}
+                        clubId={clubId || ""}
+                    />
+                </>
+            )}
+        </>
     )
 }

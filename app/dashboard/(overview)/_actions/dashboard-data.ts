@@ -402,7 +402,7 @@ export async function getClubMembers(clubId: string, limit = 4) {
                 avatar: member.user.image ?? null,
                 role: member.userId === club.clubOwnerId ? "owner" : member.role,
                 joinedAt: member.createdAt.toISOString(),
-                lastActive: "Recently", // Would need activity tracking
+                lastActive: "Recently", // Placeholder, would need last activity tracking
                 attendanceRate,
                 eventsAttended: attendances,
             }

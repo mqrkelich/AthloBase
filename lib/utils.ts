@@ -18,3 +18,7 @@ export function formatDate(input: string | number | Date): string {
 export const truncate = (str: string, maxLength: number) => {
   return str.length > maxLength ? str.slice(0, maxLength) + "..." : str;
 };
+
+export const capitalize = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
