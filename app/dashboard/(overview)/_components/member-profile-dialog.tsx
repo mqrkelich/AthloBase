@@ -150,10 +150,6 @@ export function MemberProfileDialog({open, onOpenChange, memberId, clubId}: Memb
                         </Avatar>
                         <div className="flex-1">
                             <h3 className="text-xl font-semibold">{profile.name}</h3>
-                            <div className="flex items-center gap-2 mt-1">
-                                <Mail className="h-4 w-4 text-white/60"/>
-                                <span className="text-white/60">{profile.email}</span>
-                            </div>
                             <div className="flex items-center gap-2 mt-2">
                                 <Badge variant="outline" className={`${getRoleBadgeColor(profile.role)}`}>
                                     {profile.role}
