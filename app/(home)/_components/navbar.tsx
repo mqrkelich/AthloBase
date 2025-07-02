@@ -90,7 +90,7 @@ export default function Navbar({user}: NavbarProps) {
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <Link href="/profile"
+                                    <Link href={`/profile/${user.id}`}
                                           className="flex items-center gap-2 text-white hover:bg-white/10 cursor-pointer">
                                         <User className="h-4 w-4"/>
                                         Profile

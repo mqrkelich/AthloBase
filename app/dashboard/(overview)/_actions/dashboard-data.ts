@@ -121,8 +121,6 @@ export async function getMemberDashboardMetrics(userId: string) {
     const user = await getUserById(session.id!)
     if (!user || user.id !== userId) return null
 
-    console.log("Getting member dashboard metrics for userId:", userId)
-
     // Get user's club memberships
     const memberships = await db.clubMembers.findMany({
         where: {
@@ -139,12 +137,8 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found memberships:", memberships)
-
     const clubIds = memberships.map((m) => m.clubId)
     const clubNames = memberships.map((m) => m.club.name)
-
-    console.log("Club IDs:", clubIds)
 
     // Get ALL events from user's clubs first
     const clubEvents = await db.event.findMany({
@@ -161,8 +155,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found club events:", clubEvents.length)
-
     const eventIds = clubEvents.map((e) => e.id)
 
     // Get events attended - Query by eventId being in the user's club events
@@ -176,8 +168,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found attendances:", attendances)
-
     // Get events attended this month
     const startOfMonth = new Date()
     startOfMonth.setDate(1)
@@ -187,8 +177,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         const event = clubEvents.find((e) => e.id === attendance.eventId)
         return event && event.date >= startOfMonth
     }).length
-
-    console.log("Attendances this month:", attendancesThisMonth)
 
     // Get upcoming events count (including currently active events)
     const now = new Date()
@@ -271,11 +259,7 @@ export async function getMemberDashboardMetrics(userId: string) {
         },
     })
 
-    console.log("Found registrations:", registrations.length)
-
     const attendanceRate = registrations.length > 0 ? Math.round((attendances.length / registrations.length) * 100) : 0
-
-    console.log("Calculated attendance rate:", attendanceRate)
 
     // Get member since date
     const oldestMembership =
@@ -300,8 +284,6 @@ export async function getMemberDashboardMetrics(userId: string) {
         attendanceRate,
         memberSince,
     }
-
-    console.log("Final member metrics:", result)
 
     return result
 }
@@ -694,19 +676,14 @@ export async function getMemberPerformanceData(userId: string) {
 
 export async function getDashboardEvents(userId: string, limit = 5) {
     try {
-        console.log("getDashboardEvents called with:", {userId, limit})
 
         const session = await getCurrentUser()
-        console.log("Session:", session)
         if (!session) {
-            console.log("No session found")
             return []
         }
 
         const user = await getUserById(session.id!)
-        console.log("User:", user)
         if (!user || user.id !== userId) {
-            console.log("User not found or ID mismatch")
             return []
         }
 
@@ -719,13 +696,9 @@ export async function getDashboardEvents(userId: string, limit = 5) {
                 clubId: true,
             },
         })
-        console.log("User memberships:", memberships)
 
         const clubIds = memberships.map((m) => m.clubId)
-        console.log("Club IDs:", clubIds)
-
-        if (clubIds.length === 0) {
-            console.log("No clubs found for user")
+     if (clubIds.length === 0) {
             return []
         }
 
@@ -764,14 +737,9 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             ],
         })
 
-        console.log("All events from database:", allEvents.length)
-
         // Filter events to show upcoming AND currently active events
         const now = new Date()
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-
-        console.log("Current time:", now.toISOString())
-        console.log("Today date:", today.toISOString())
 
         const upcomingAndActiveEvents = allEvents
             .filter((event) => {
@@ -780,7 +748,6 @@ export async function getDashboardEvents(userId: string, limit = 5) {
 
                 // If event is on a future date, it's upcoming
                 if (eventDateOnly > today) {
-                    console.log(`Event "${event.title}" is on future date:`, eventDateOnly.toISOString())
                     return true
                 }
 
@@ -796,27 +763,13 @@ export async function getDashboardEvents(userId: string, limit = 5) {
                     const isUpcoming = eventDateTime > now
                     const isCurrentlyActive = now >= eventDateTime && now <= eventEndTime
 
-                    console.log(`Event "${event.title}" is today:`, {
-                        eventTime: event.time,
-                        eventDateTime: eventDateTime.toISOString(),
-                        eventEndTime: eventEndTime.toISOString(),
-                        now: now.toISOString(),
-                        duration: event.duration,
-                        isUpcoming,
-                        isCurrentlyActive,
-                        shouldShow: isUpcoming || isCurrentlyActive,
-                    })
-
                     return isUpcoming || isCurrentlyActive
                 }
 
                 // Event is in the past
-                console.log(`Event "${event.title}" is in the past:`, eventDateOnly.toISOString())
                 return false
             })
             .slice(0, limit)
-
-        console.log("Filtered upcoming and active events:", upcomingAndActiveEvents.length)
 
         const mappedEvents = upcomingAndActiveEvents.map((event) => ({
             id: event.id,
@@ -833,7 +786,6 @@ export async function getDashboardEvents(userId: string, limit = 5) {
             duration: event.duration || 60,
         }))
 
-        console.log("Final mapped events:", mappedEvents)
         return mappedEvents
     } catch (error) {
         console.error("Error fetching dashboard events:", error)
@@ -843,19 +795,14 @@ export async function getDashboardEvents(userId: string, limit = 5) {
 
 export async function getOwnerEvents(clubId: string, limit = 5) {
     try {
-        console.log("getOwnerEvents called with:", {clubId, limit})
 
         const session = await getCurrentUser()
-        console.log("Session:", session)
         if (!session) {
-            console.log("No session found")
             return null
         }
 
         const user = await getUserById(session.id!)
-        console.log("User:", user)
         if (!user) {
-            console.log("No user found")
             return []
         }
 
@@ -866,10 +813,8 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
                 clubOwnerId: user.id,
             },
         })
-        console.log("Club found:", club)
 
         if (!club) {
-            console.log("No club found or user is not owner")
             return []
         }
 
@@ -896,14 +841,9 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
             ],
         })
 
-        console.log("All events from database:", allEvents.length)
-
         // Filter events to show upcoming AND currently active events
         const now = new Date()
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-
-        console.log("Current time:", now.toISOString())
-        console.log("Today date:", today.toISOString())
 
         const upcomingAndActiveEvents = allEvents
             .filter((event) => {
@@ -912,7 +852,6 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
 
                 // If event is on a future date, it's upcoming
                 if (eventDateOnly > today) {
-                    console.log(`Owner Event "${event.title}" is on future date:`, eventDateOnly.toISOString())
                     return true
                 }
 
@@ -928,27 +867,13 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
                     const isUpcoming = eventDateTime > now
                     const isCurrentlyActive = now >= eventDateTime && now <= eventEndTime
 
-                    console.log(`Owner Event "${event.title}" is today:`, {
-                        eventTime: event.time,
-                        eventDateTime: eventDateTime.toISOString(),
-                        eventEndTime: eventEndTime.toISOString(),
-                        now: now.toISOString(),
-                        duration: event.duration,
-                        isUpcoming,
-                        isCurrentlyActive,
-                        shouldShow: isUpcoming || isCurrentlyActive,
-                    })
-
                     return isUpcoming || isCurrentlyActive
                 }
 
                 // Event is in the past
-                console.log(`Owner Event "${event.title}" is in the past:`, eventDateOnly.toISOString())
                 return false
             })
             .slice(0, limit)
-
-        console.log("Filtered upcoming and active events:", upcomingAndActiveEvents.length)
 
         const mappedEvents = upcomingAndActiveEvents.map((event) => ({
             id: event.id,
@@ -963,7 +888,6 @@ export async function getOwnerEvents(clubId: string, limit = 5) {
             duration: event.duration || 60,
         }))
 
-        console.log("Final mapped events:", mappedEvents)
         return mappedEvents
     } catch (error) {
         console.error("Error fetching owner events:", error)
