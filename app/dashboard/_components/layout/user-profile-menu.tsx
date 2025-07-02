@@ -14,8 +14,10 @@ import {
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import {SignOutButton} from "./sign-out"
 import {getUserInitials} from "@/lib/helper/get-initials";
+import Link from "next/link";
 
 interface UserProfile {
+    id: string
     name: string
     avatar: string | null
 }
@@ -47,7 +49,9 @@ export function UserProfileMenu({user, onProfileClick, onSettingsClick}: UserPro
                 <DropdownMenuSeparator/>
                 <DropdownMenuItem onClick={onProfileClick}>
                     <User className="mr-2 h-4 w-4"/>
-                    <span>Profile</span>
+                    <Link href={`/profile/${user.id}`} className="flex-1">
+                        <span>Profile</span>
+                    </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onSettingsClick}>
                     <Settings className="mr-2 h-4 w-4"/>

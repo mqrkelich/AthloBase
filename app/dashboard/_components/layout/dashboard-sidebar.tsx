@@ -66,7 +66,7 @@ export async function DashboardSidebar({currentRole, userRoles}: DashboardSideba
             </SidebarContent>
 
             <SidebarFooter className="p-4">
-                <UserProfileMenu user={{avatar: user.image, name: user.name || "Unknown"}}/>
+                <UserProfileMenu user={{avatar: user.image, name: user.name || "Unknown", id: user.id }}/>
             </SidebarFooter>
         </Sidebar>
     )
