@@ -1,57 +1,75 @@
-import {createUploadthing, type FileRouter} from "uploadthing/next";
-import {UploadThingError} from "uploadthing/server";
+import { createUploadthing, type FileRouter } from "uploadthing/next"
+import { UploadThingError } from "uploadthing/server"
 
-import {auth} from "@/lib/auth";
+import { auth } from "@/lib/auth"
 
-const f = createUploadthing();
+const f = createUploadthing()
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
+  logoUploader: f({
+    image: {
+      maxFileSize: "2MB",
+      maxFileCount: 1,
+    },
+  })
+    // Set permissions and file types for this FileRoute
+    .middleware(async () => {
+      // This code runs on your server before upload
+      const session = await auth()
 
-    logoUploader: f({
-        image: {
-            maxFileSize: "2MB",
-            maxFileCount: 1,
-        },
+      // If you throw, the user will not be able to upload
+      if (!session) throw new UploadThingError("Unauthorized")
+
+      return { userId: session.user.id }
     })
-        // Set permissions and file types for this FileRoute
-        .middleware(async () => {
-            // This code runs on your server before upload
-            const session = await auth();
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Upload complete for userId:", metadata.userId)
 
-            // If you throw, the user will not be able to upload
-            if (!session) throw new UploadThingError("Unauthorized");
+      console.log("file url", file.url)
 
-            return {userId: session.user.id};
-        })
-        .onUploadComplete(async ({metadata, file}) => {
+      return { uploadedBy: metadata.userId }
+    }),
 
-            console.log("Upload complete for userId:", metadata.userId);
+  coverUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const session = await auth()
 
-            console.log("file url", file.ufsUrl);
+      if (!session) throw new UploadThingError("Unauthorized")
 
-            return {uploadedBy: metadata.userId};
-        }),
-
-    coverUploader: f({
-        image: {
-            maxFileSize: "4MB",
-            maxFileCount: 1,
-        },
+      return { userId: session.user.id }
     })
-        .middleware(async () => {
-            const session = await auth();
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Cover upload complete for userId:", metadata.userId)
+      console.log("file url", file.url)
 
-            if (!session) throw new UploadThingError("Unauthorized");
+      return { uploadedBy: metadata.userId }
+    }),
 
-            return {userId: session.user.id};
-        })
-        .onUploadComplete(async ({metadata, file}) => {
-            console.log("Cover upload complete for userId:", metadata.userId);
-            console.log("file url", file.ufsUrl);
+  avatarUploader: f({
+    image: {
+      maxFileSize: "2MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const session = await auth()
 
-            return {uploadedBy: metadata.userId};
-        }),
-} satisfies FileRouter;
+      if (!session) throw new UploadThingError("Unauthorized")
 
-export type OurFileRouter = typeof ourFileRouter;
+      return { userId: session.user.id }
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Avatar upload complete for userId:", metadata.userId)
+      console.log("file url", file.url)
+
+      return { uploadedBy: metadata.userId }
+    }),
+} satisfies FileRouter
+
+export type OurFileRouter = typeof ourFileRouter
