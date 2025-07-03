@@ -252,9 +252,18 @@ export default function ProfileSettingsPage() {
                         onUploadError={handleAvatarUploadError}
                         onUploadBegin={() => setUploadingAvatar(true)}
                         appearance={{
-                          button:
-                            "bg-white text-black hover:bg-white/90 text-sm px-4 py-2 rounded-md font-medium transition-colors",
-                          allowedContent: "text-white/60 text-xs",
+                          button: `
+                            bg-gradient-to-r from-zinc-800 to-zinc-700 
+                            hover:from-zinc-700 hover:to-zinc-600 
+                            text-white border border-white/20 
+                            text-sm px-6 py-3 rounded-lg font-medium 
+                            transition-all duration-200 
+                            shadow-lg hover:shadow-xl
+                            backdrop-blur-sm
+                            ${uploadingAvatar ? "opacity-50 cursor-not-allowed" : ""}
+                          `,
+                          allowedContent: "text-white/60 text-xs mt-2",
+                          container: "flex flex-col items-start",
                         }}
                         content={{
                           button: uploadingAvatar ? (
@@ -270,8 +279,9 @@ export default function ProfileSettingsPage() {
                           ),
                           allowedContent: "JPG, PNG up to 2MB",
                         }}
+                        disabled={uploadingAvatar}
                       />
-                      <Badge variant="outline" className="border-white/20 text-white/80">
+                      <Badge variant="outline" className="border-white/20 text-white/80 bg-white/5">
                         2MB max
                       </Badge>
                     </div>
